@@ -64,16 +64,19 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
 .top>div:not(.lang){min-width:0}
 .top h1{white-space:nowrap}
 .top .sub{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-@media (max-width:520px){#menuLabel{display:none}.menu>summary{padding:9px 11px}.lang button{padding:6px 9px}.top .logo{width:36px;height:36px}}
+@media (max-width:520px){#menuLabel{display:none}.menu>summary{padding:9px 11px}.menu>summary:has(.pfp:not([hidden])){padding:5px;width:40px;height:40px;justify-content:center}.menu>summary .pfp{margin:0;width:28px;height:28px}.lang button{padding:6px 9px}.top .logo{width:36px;height:36px}}
 .gate>.lang{position:absolute;z-index:2;top:calc(16px + env(safe-area-inset-top,0px));right:max(16px,env(safe-area-inset-right,0px));background:rgba(14,17,48,.5);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
 .menu>summary{list-style:none;display:flex;align-items:center;gap:8px;background:var(--card-2);border:1px solid var(--line);padding:9px 16px;border-radius:999px;font-size:13.5px;font-weight:600;color:var(--fg);cursor:pointer;transition:background .2s}
 .menu>summary:hover{background:var(--card-3)}
+.menu>summary .pfp{width:26px;height:26px;border-radius:50%;object-fit:cover;margin:-5px 0 -5px -9px;flex:none}
 .menu>summary::-webkit-details-marker{display:none}
 .menu>summary svg{width:16px;height:16px;color:var(--muted)}
-.menu-pop{position:absolute;right:0;top:calc(100% + 10px);z-index:25;min-width:260px;padding:8px;border-radius:var(--r-md);background:var(--card-2);border:1px solid var(--line-strong);box-shadow:var(--shadow);display:flex;flex-direction:column;animation:pop .2s cubic-bezier(.2,.9,.25,1)}
+.menu-pop{position:absolute;right:0;top:calc(100% + 10px);z-index:25;min-width:300px;padding:8px;border-radius:var(--r-md);background:var(--card-2);border:1px solid var(--line-strong);box-shadow:var(--shadow);display:flex;flex-direction:column;animation:pop .2s cubic-bezier(.2,.9,.25,1)}
 @keyframes pop{from{transform:translateY(-6px) scale(.98)}}
-.menu-pop button{border:0;background:transparent;text-align:left;padding:10px 12px;border-radius:var(--r-sm);font-size:14px;color:var(--fg)}
+.menu-pop button{display:flex;align-items:flex-start;gap:12px;border:0;background:transparent;text-align:left;padding:10px 12px;border-radius:var(--r-sm);font-size:14px;color:var(--fg)}
 .menu-pop button small{display:block;font-size:12px;color:var(--muted)}
+.menu-pop .mi{width:18px;height:18px;flex:none;margin-top:3px;color:var(--muted)}
+.menu-pop #logoutBtn .mi{color:var(--loss)}
 .menu-pop button:hover{background:var(--card-3)}
 .menu-pop hr{border:0;border-top:1px solid var(--line);margin:6px 8px}
 .sync{display:inline-flex;align-items:center;gap:6px}
@@ -345,14 +348,14 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.8)}
     </div>
     <div class="lang" role="group" aria-label="ภาษา / Language"><button type="button" data-lang="th" aria-pressed="true">ไทย</button><button type="button" data-lang="en" aria-pressed="false">EN</button></div>
     <details class="menu" id="menu">
-      <summary><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span id="menuLabel">เมนู</span></summary>
+      <summary><img class="pfp" id="pfp" alt="" referrerpolicy="no-referrer" hidden><svg id="pfpIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span id="menuLabel">เมนู</span></summary>
       <div class="menu-pop">
-        <button type="button" id="exportBtn">ดาวน์โหลดไฟล์สำรอง<small>เก็บไว้ย้ายไปเครื่องอื่นหรือกันข้อมูลหาย</small></button>
-        <button type="button" id="importBtn">นำเข้าไฟล์สำรอง<small>แทนที่ข้อมูลทั้งหมดด้วยไฟล์</small></button>
+        <button type="button" id="exportBtn"><svg class="mi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg><span>ดาวน์โหลดไฟล์สำรอง<small>เก็บไว้ย้ายไปเครื่องอื่นหรือกันข้อมูลหาย</small></span></button>
+        <button type="button" id="importBtn"><svg class="mi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg><span>นำเข้าไฟล์สำรอง<small>แทนที่ข้อมูลทั้งหมดด้วยไฟล์</small></span></button>
         <hr>
-        <button type="button" id="linkBtn" hidden>ย้ายข้อมูลจากบัญชี PIN เดิม<small>ใช้ชื่อผู้ใช้กับ PIN ที่เคยตั้งไว้</small></button>
+        <button type="button" id="linkBtn" hidden><svg class="mi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 3 4 4-4 4"/><path d="M20 7H4"/><path d="m8 21-4-4 4-4"/><path d="M4 17h16"/></svg><span>ย้ายข้อมูลจากบัญชี PIN เดิม<small>ใช้ชื่อผู้ใช้กับ PIN ที่เคยตั้งไว้</small></span></button>
         <hr>
-        <button type="button" id="logoutBtn" hidden>ออกจากระบบ<small id="logoutSub"></small></button>
+        <button type="button" id="logoutBtn" hidden><svg class="mi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg><span>ออกจากระบบ<small id="logoutSub"></small></span></button>
       </div>
     </details>
   </header>
@@ -461,6 +464,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.8)}
     <p class="err" id="b-err" role="alert" hidden></p>
     <button type="submit" class="submit" id="b-submit">บันทึก</button>
     <div class="sheet-foot" id="b-foot" hidden>
+      <button type="button" class="btn primary" id="b-sell" hidden>จดการขายรายการนี้</button>
       <button type="button" class="btn" id="b-unsell" hidden>ยกเลิกการขาย</button>
       <button type="button" class="btn" id="b-del">ลบรายการนี้</button>
     </div>
@@ -588,7 +592,7 @@ const EN={
 "ราคาที่ซื้อ ต่อหุ้น":"Buy price per share","ราคาเป็นสกุลเงินต่างประเทศ":"Price in foreign currency","ราคาเป็นบาท":"Price in baht",
 "เรต Dime ตอนซื้อ":"Dime rate at buy","บาท / 1":"THB / 1","กรอกช่องดอลลาร์หรือบาทช่องไหนก็ได้ อีกช่องจะคำนวณให้":"Fill in either box; the other is calculated for you",
 "จำนวนหุ้น":"Shares","วันที่ซื้อ":"Buy date","โน้ต (ไม่ใส่ก็ได้)":"Note (optional)","เงินที่ใช้ซื้อ":"Total cost","บันทึก":"Save",
-"ยกเลิกการขาย":"Undo sell","ลบรายการนี้":"Delete this entry",
+"ยกเลิกการขาย":"Undo sell","จดการขายรายการนี้":"Log a sell for this","ลบรายการนี้":"Delete this entry",
 "จดการขาย":"Log a sell","ราคาที่ขาย ต่อหุ้น":"Sell price per share","ราคาขายเป็นสกุลเงินต่างประเทศ":"Sell price in foreign currency","ราคาขายเป็นบาท":"Sell price in baht",
 "เรต Dime ตอนขาย":"Dime rate at sell","จำนวนที่ขาย":"Shares sold","วันที่ขาย":"Sell date","ขายทั้งหมด":"Sell all","ขายครึ่งหนึ่ง":"Sell half",
 "ขายไม่หมด ส่วนที่เหลือจะแยกเป็นอีกรายการที่ยังถืออยู่":"Partial sell: the rest stays as a separate holding","กำไร":"Profit","บันทึกการขาย":"Save sell",
@@ -788,8 +792,8 @@ function tableHTML(list,sample){
       <td class="m-only"><div class="mline num"><span class="mk">${tt("ซื้อ","Buy")}</span>${baht(costT(l))}</div><div class="mline num"><span class="mk">${tt("ขาย","Sell")}</span>${s?baht(sellT(l)*l.qty):`<span class="chip hold">${tt("ยังถือ","Holding")}</span>`}</div></td>
       <td class="r d-only"><div class="main num">${baht(costT(l))}</div><div class="sub num">${orig(l.buyPrice*l.qty,l.ccy)}${fdate(l.buyDate)}</div></td>
       <td class="r d-only">${s?`<div class="main num">${baht(sellT(l)*l.qty)}</div><div class="sub num">${orig(l.sellPrice*l.qty,l.ccy)}${fdate(l.sellDate)}</div>`:`<span class="chip hold">${tt("ยังถือ","Holding")}</span>`}</td>
-      <td class="r plc">${s?`<span class="plpill num ${tone(p)}">${baht(p,true)}</span><div class="sub num tone-${tone(p)}" style="margin-top:4px">${pct(pctT(l))}</div>`:(sample?`<span class="muted">—</span>`:`<button type="button" class="mini primary m-btn" data-sell="${esc(l.id)}">${tt("ขาย","Sell")}</button><span class="muted d-only">—</span>`)}</td>
-      <td class="d-only">${sample?"":`<div class="acts">${s?"":`<button type="button" class="mini primary" data-sell="${esc(l.id)}">${tt("ขาย","Sell")}</button>`}<button type="button" class="mini" data-edit="${esc(l.id)}">${tt("แก้ไข","Edit")}</button></div>`}</td></tr>`;
+      <td class="r plc">${s?`<span class="plpill num ${tone(p)}">${baht(p,true)}</span><div class="sub num tone-${tone(p)}" style="margin-top:4px">${pct(pctT(l))}</div>`:(sample?`<span class="muted">—</span>`:`<span class="muted">—</span>`)}</td>
+      <td class="d-only">${sample?"":`<div class="acts"><button type="button" class="mini" data-edit="${esc(l.id)}">${tt("แก้ไข","Edit")}</button></div>`}</td></tr>`;
   }).join("")+`</tbody>${foot?`<tfoot>${foot}</tfoot>`:""}</table></div>`;
 }
 const DIV_LIMIT=5;
@@ -884,7 +888,7 @@ function openBuy(lot){
   else{$("b-fp").value="";$("b-tp").value="";setCcy("THB");}
   $("b-qty").value=lot?lot.qty:""; $("b-date").value=lot?lot.buyDate:today(); $("b-note").value=lot?lot.note||"":"";
   $("b-err").hidden=true; $("b-submit").disabled=false; $("b-submit").textContent=lot?tt("บันทึกการแก้ไข","Save changes"):tt("บันทึก","Save");
-  $("b-foot").hidden=!lot; $("b-unsell").hidden=!(lot&&sold(lot));
+  $("b-foot").hidden=!lot; $("b-unsell").hidden=!(lot&&sold(lot)); $("b-sell").hidden=!(lot&&!sold(lot));
   $("b-del").textContent=tt("ลบรายการนี้","Delete this entry"); $("b-del").className="btn";
   setZone("buy","idle"); renderQuick("b-recent",recentSyms(false),!!editing); pvBuy();
   openSheet("bdBuy"); setTimeout(()=>$(lot?"b-qty":"b-sym").focus(),60);
@@ -920,6 +924,7 @@ $("b-del").addEventListener("click",()=>{
   if(!delArmed){delArmed=true;$("b-del").textContent=tt("กดอีกครั้งเพื่อยืนยันลบ","Tap again to delete");$("b-del").className="btn danger";return;}
   data.lots=data.lots.filter(x=>x.id!==editing.id); save(); sync([{op:"delLot",id:editing.id}]); closeAll(); render(); scheduleDividends(); toast(tt("ลบรายการแล้ว","Entry deleted"));
 });
+$("b-sell").addEventListener("click",()=>{if(editing&&!sold(editing))openSell(editing);});
 $("b-unsell").addEventListener("click",()=>{
   if(!editing)return;
   const i=data.lots.findIndex(x=>x.id===editing.id); if(i<0)return;
@@ -1235,6 +1240,7 @@ async function pull(){
     const r=await api("/api/data",{method:"GET"});
     if(r.status===401){expired();return;}
     if(!r.ok)throw 0;
+    if(r.data.profile){const pr=r.data.profile;if((pr.picture||"")!==auth.picture||(pr.name&&pr.name!==auth.name)){auth.picture=pr.picture||"";if(pr.name)auth.name=pr.name;if(pr.email)auth.email=pr.email;saveSession();applyAccountUI();}}
     data=shape(r.data); save(); render(); scheduleDividends(); offline=false; syncLabel();
   }catch(e){offline=true;syncLabel();}
 }
@@ -1245,6 +1251,9 @@ function applyAccountUI(){
   $("menuLabel").textContent=cloud?(auth.name?auth.name.split(" ")[0]:label):tt("เมนู","Menu");
   $("logoutBtn").hidden=!cloud; $("linkBtn").hidden=!cloud;
   $("logoutSub").textContent=cloud?(auth.email||""):"";
+  const pic=cloud&&/^https:\/\//.test(auth.picture||"")?auth.picture:"";
+  if(pic&&$("pfp").getAttribute("src")!==pic){$("pfp").onerror=()=>{$("pfp").hidden=true;$("pfpIcon").removeAttribute("hidden");};$("pfp").src=pic;}
+  $("pfp").hidden=!pic; $("pfpIcon").toggleAttribute("hidden",!!pic);
   syncLabel();
 }
 function enterLocal(){
@@ -1252,9 +1261,10 @@ function enterLocal(){
   data=loadData(KEY); $("gate").hidden=true; $("moveBanner").hidden=true;
   applyAccountUI(); render(); fetchDividends(false);
 }
+function saveSession(){lsSet(SESSION_KEY,JSON.stringify({user:auth.user,token:auth.token,email:auth.email,name:auth.name,picture:auth.picture}));}
 async function enterCloud(user,token,fresh,prof){
   prof=prof||{};
-  auth={mode:"cloud",user,token,email:prof.email||"",name:prof.name||""}; lsSet(MODE_KEY,"cloud"); lsSet(SESSION_KEY,JSON.stringify({user,token,email:auth.email,name:auth.name}));
+  auth={mode:"cloud",user,token,email:prof.email||"",name:prof.name||"",picture:prof.picture||""}; lsSet(MODE_KEY,"cloud"); saveSession();
   try{queue=JSON.parse(lsGet("stockbook.queue."+user)||"[]")||[];}catch(e){queue=[];}
   data=loadData(); $("gate").hidden=true; applyAccountUI(); render();
   if(queue.length)await flush();
@@ -1294,7 +1304,7 @@ async function onGoogle(resp){
     const r=await api("/api/auth",{method:"POST",body:JSON.stringify({action:"google",credential:resp.credential})});
     if(r.status===503){noStorage();throw 0;}
     if(!r.ok)throw 0;
-    await enterCloud(r.data.user,r.data.token,false,{email:r.data.email,name:r.data.name});
+    await enterCloud(r.data.user,r.data.token,false,{email:r.data.email,name:r.data.name,picture:r.data.picture});
     toast((LANG==="en"?"Welcome ":"ยินดีต้อนรับ ")+`${r.data.name||r.data.email||""}`);
   }catch(e){gErr(tt("เข้าสู่ระบบไม่สำเร็จ ลองใหม่อีกครั้ง","Sign-in failed. Please try again"));}
   renderGoogleBtn();
@@ -1368,7 +1378,7 @@ function boot(){
   setLang(LANG,true);
   let sess=null; try{sess=JSON.parse(lsGet(SESSION_KEY)||"null");}catch(e){}
   // only Google sessions are kept; older username+PIN sessions sign in again with Google
-  if(sess&&sess.user&&sess.token&&String(sess.user).startsWith("g:")){enterCloud(sess.user,sess.token,false,{email:sess.email,name:sess.name});return;}
+  if(sess&&sess.user&&sess.token&&String(sess.user).startsWith("g:")){enterCloud(sess.user,sess.token,false,{email:sess.email,name:sess.name,picture:sess.picture});return;}
   lsSet(SESSION_KEY,null); lsSet(MODE_KEY,null);
   applyAccountUI(); render(); showGate();
 }

@@ -1,4 +1,4 @@
-// GET  /api/data            → { username, lots, divs, rates }
+// GET  /api/data            → { username, lots, divs, rates, profile }
 // POST /api/data { ops: [] } → apply changes, one item at a time, so two devices never
 // overwrite each other's whole notebook. Ops:
 //   { op: "putLot", lot }   { op: "delLot", id }
@@ -36,7 +36,11 @@ module.exports = async (req, res) => {
         else if (f.startsWith("div:")) divs.push(v);
         else if (f === "rates") rates = v || {};
       }
-      return L.send(res, 200, { username, lots, divs, rates });
+      let profile = null;
+      if (username.startsWith("g:")) {
+        try { const pr = JSON.parse((await L.kv(["GET", "profile:" + username])) || "null"); if (pr) profile = { name: pr.name || "", email: pr.email || "", picture: pr.picture || "" }; } catch (e) {}
+      }
+      return L.send(res, 200, { username, lots, divs, rates, profile });
     }
 
     if (req.method === "POST") {
