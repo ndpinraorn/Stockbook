@@ -82,6 +82,43 @@
     return null;
   }
 
+  /* Labels as OCR tends to read them: tone marks and vowels may be dropped or swapped
+     ("ราคาที่ได้อริง"), so match loosely on the stable consonants. */
+  const PRICE_LBL = /ราคา\s*ท\S{0,3}\s*ได\S{0,2}\s*[จอ]\S{0,3}ง/;
+  const QTY_LBL = /จ\S{0,2}นวน\s*หุ/;
+  function numsIn(line) {
+    return (line.match(/\d[\d,]*\.?\d*/g) || []).map((raw) => ({ raw, v: toNum(raw), dec: decimals(raw) })).filter((x) => x.v > 0);
+  }
+  function anchored(text) {
+    const lines = String(text).split(/\n+/).map((s) => s.trim()).filter(Boolean);
+    const out = { price: null, qty: null };
+    for (let i = 0; i < lines.length; i++) {
+      const L = lines[i];
+      if (PRICE_LBL.test(L)) {
+        // value either after the label on the same line, or on the next line
+        const after = L.split(PRICE_LBL)[1] || "";
+        const sameQtyLbl = QTY_LBL.test(L);
+        let cand = numsIn(after.split(QTY_LBL)[0]);
+        let src = cand.length ? after : lines[i + 1] || "";
+        if (!cand.length) cand = numsIn(src);
+        if (cand.length) {
+          out.price = cand[0].v;
+          if (sameQtyLbl && cand.length > 1) out.qty = cand[1].v;
+        }
+      } else if (!out.qty && QTY_LBL.test(L) && !PRICE_LBL.test(L)) {
+        const after = numsIn(L.split(QTY_LBL)[1] || "");
+        if (after.length) out.qty = after[0].v;
+        else {
+          // label in the right-hand column → take the right-hand number on the next row
+          const n = numsIn(lines[i + 1] || "");
+          const rightCol = /\S/.test(L.split(QTY_LBL)[0]);
+          if (n.length) out.qty = (rightCol ? n[n.length - 1] : n[0]).v;
+        }
+      }
+    }
+    return out;
+  }
+
   /* Order confirmation: price per share, shares, rate, date. Price × shares must match a
      total on the screen, which keeps us from mixing up the per-share price and the total. */
   function parseOrder(text) {
@@ -105,8 +142,15 @@
         }
       }
     }
-    let price = best ? best.price : priced.length ? priced[0].v : null;
-    let qty = best ? best.qty : null;
+    /* Dime puts the executed price under the label "ราคาที่ได้จริง" (and the share count
+       under "จำนวนหุ้น" on the same row). Values read from those labels always win. */
+    const anc = anchored(body);
+    let price = anc.price || (best ? best.price : priced.length ? priced[0].v : null);
+    let qty = anc.qty || (best && (!anc.price || Math.abs(best.price - anc.price) < 1e-9) ? best.qty : null);
+    if (anc.price && !anc.qty && !qty) {
+      const tot = priced.filter((a) => a.v !== anc.price);
+      for (const q of nums) for (const t2 of tot) if (Math.abs(anc.price * q.v - t2.v) / t2.v < 0.006) { qty = q.v; break; }
+    }
     if (!qty) {
       const q = nums.filter((n) => !amts.some((a) => a.v === n.v)).sort((a, b) => b.dec - a.dec)[0];
       qty = q ? q.v : null;
