@@ -7,8 +7,8 @@
 <meta name="description" content="จดราคาซื้อ-ขายหุ้นไทยและหุ้นสหรัฐ ดูกำไร ROI และปันผลเป็นเงินบาท">
 <meta name="theme-color" content="#06071A">
 
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/mark-32.png">
-<link rel="icon" type="image/png" sizes="192x192" href="/icons/mark-192.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/logo-32.png">
+<link rel="icon" type="image/png" sizes="64x64" href="/icons/logo-64.png">
 <link rel="apple-touch-icon" href="/icons/mark-180.png">
 <link rel="manifest" href="/manifest.webmanifest">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -51,7 +51,7 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
 
 /* header */
 .top{display:flex;align-items:center;gap:12px}
-.logo{width:44px;height:44px;border-radius:12px;flex:none;display:block;object-fit:cover}
+.logo{width:44px;height:44px;flex:none;display:block;object-fit:contain}
 .top h1{font-size:17px;font-weight:700;margin:0;line-height:1.25}
 .top .sub{font-size:12px;color:var(--muted)}
 .menu{margin-left:auto;position:relative}
@@ -121,7 +121,7 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
 
 /* first-run */
 .welcome{display:flex;flex-direction:column;align-items:flex-start;gap:10px;padding:36px 28px;animation:fadeup .5s cubic-bezier(.2,.8,.2,1)}
-.welcome .w-ic{width:72px;height:72px;border-radius:18px;display:block;object-fit:cover}
+.welcome .w-ic{width:72px;height:72px;display:block;object-fit:contain}
 .welcome h2{margin:8px 0 0;font-size:26px;font-weight:700}
 .welcome p{margin:0;color:var(--muted);max-width:46ch}
 .welcome .w-acts{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
@@ -204,7 +204,7 @@ th[aria-sort] .sortb{color:var(--fg)}
 .gate .bg{position:absolute}
 .gate-card{position:relative;z-index:1;width:100%;max-width:400px;display:flex;flex-direction:column;gap:20px;animation:fadeup .5s cubic-bezier(.2,.8,.2,1)}
 .gate-brand{display:flex;flex-direction:column;align-items:flex-start;gap:12px}
-.gate-brand .logo{width:88px;height:88px;border-radius:22px}
+.gate-brand .logo{width:88px;height:88px}
 .gate-brand h1{margin:0;font-size:30px;font-weight:700;line-height:1.2;letter-spacing:-.01em}
 .gate-brand p{margin:0;color:var(--muted);font-size:14.5px}
 .gate-form{display:flex;flex-direction:column;gap:14px;padding:22px;border-radius:var(--r);background:linear-gradient(160deg,var(--card-2),var(--card));border:1px solid var(--line);box-shadow:var(--shadow)}
@@ -309,7 +309,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.8)}
 <div class="bg" aria-hidden="true"></div>
 <div class="wrap">
   <header class="top">
-    <img class="logo" src="/icons/mark-192.png" alt="" width="44" height="44">
+    <img class="logo" src="/icons/logo-96.png" alt="" width="44" height="44">
     <div>
       <h1>nd-stockbook</h1>
       <div class="sub"><span class="sync" id="syncState" data-s="local"><i></i><span id="syncText">บันทึกไว้ในเบราว์เซอร์นี้</span></span></div>
@@ -333,7 +333,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.8)}
   </div>
 
   <section class="welcome card" id="welcome" hidden>
-    <img class="w-ic" src="/icons/mark-192.png" alt="" width="72" height="72">
+    <img class="w-ic" src="/icons/logo-192.png" alt="" width="72" height="72">
     <h2>เริ่มจดรายการแรก</h2>
     <p>จดตอนซื้อ แล้วใส่ราคาขายทีหลัง ระบบจะคำนวณกำไร ROI และปันผลเป็นเงินบาทให้</p>
     <div class="w-acts"><button type="button" class="submit" data-open-add>จดการซื้อ</button><button type="button" class="pillbtn" data-scan-pick="main">อ่านจากภาพ Dime</button></div>
@@ -498,7 +498,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.8)}
   <div class="bg" aria-hidden="true"></div>
   <div class="gate-card">
     <div class="gate-brand">
-      <img class="logo" src="/icons/mark-192.png" alt="" width="44" height="44">
+      <img class="logo" src="/icons/logo-192.png" alt="" width="44" height="44">
       <h1>nd-stockbook</h1>
       <p>เข้าสู่ระบบแล้วเปิดจากมือถือหรือคอมเครื่องไหนก็เห็นข้อมูลชุดเดียวกัน</p>
     </div>
