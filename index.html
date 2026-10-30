@@ -5,162 +5,214 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>สมุดพอร์ตหุ้น</title>
 <meta name="description" content="จดราคาซื้อ-ขายหุ้นไทยและหุ้นสหรัฐ ดูกำไร ROI และปันผลเป็นเงินบาท">
-<meta name="theme-color" content="#EDF1F7" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0B101B" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#06071A">
+<script>try{document.documentElement.dataset.palette=localStorage.getItem("stockbook.palette")||"indigo"}catch(e){}</script>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232947D3'/%3E%3Cpath d='M7 22l6-6 5 5 8-9' fill='none' stroke='white' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap">
 <style>
-/* Layout: one calm column (max 960px). Open hero (baht result, ROI, quiet facts) → trades table → dividends table. Sheets rise from the bottom to add, edit, sell or record a dividend. */
+/* Layout: dark fintech column (max 960px). Header → open hero (baht result + ROI) → holdings card with round quick actions → P/L chart with range chips → segmented filter → trades list card → dividends. Sheets rise from the bottom.
+   Palettes: indigo (default) · navy · violet, switched with data-palette on <html>. */
 :root{
-  --bg:#EDF1F7; --blob1:#C7D5FF; --blob2:#C4EEDF;
-  --surface-2:rgba(255,255,255,.5); --surface-solid:#FFFFFF;
-  --line:rgba(28,42,78,.09); --line-strong:rgba(28,42,78,.16);
-  --fg:#131A2C; --muted:#56617B; --faint:#8A93A9;
-  --accent:#2947D3; --accent-fg:#FFFFFF; --accent-soft:rgba(41,71,211,.09);
-  --gain:#0B9A53; --gain-soft:rgba(11,154,83,.11); --loss:#D5363F; --loss-soft:rgba(213,54,63,.10);
-  --hold:#A86A12; --hold-soft:rgba(200,130,20,.12);
-  --row-hover:rgba(41,71,211,.035); --foot:#F6F8FB;
-  --shadow:0 1px 2px rgba(20,30,60,.05),0 10px 30px rgba(20,30,60,.07);
-  --r:12px; --r-sm:8px;
+  --bg:#06071A; --bg-glow1:rgba(98,84,255,.30); --bg-glow2:rgba(46,120,255,.18);
+  --card:#0E1130; --card-2:#161A3E; --card-3:#1F2450;
+  --line:rgba(170,180,255,.08); --line-strong:rgba(170,180,255,.16);
+  --fg:#EEF0FF; --muted:#A3A8CF; --faint:#6E739C;
+  --accent:#7B6CFF; --accent-2:#3E8BFF; --accent-fg:#FFFFFF; --accent-soft:rgba(123,108,255,.16); --accent-line:rgba(123,108,255,.45);
+  --gain:#3DDC97; --gain-soft:rgba(61,220,151,.13); --loss:#FF6B81; --loss-soft:rgba(255,107,129,.14);
+  --hold:#FFC069; --hold-soft:rgba(255,192,105,.14);
+  --shadow:0 20px 50px -24px rgba(0,0,0,.7);
+  --r:22px; --r-md:16px; --r-sm:12px;
   --font:"IBM Plex Sans Thai","Noto Sans Thai","Leelawadee UI",system-ui,sans-serif;
-  color-scheme:light;
-}
-@media (prefers-color-scheme: dark){:root{
-  --bg:#0B101B; --blob1:#1A2A5E; --blob2:#0D3A31;
-  --surface-2:rgba(23,31,50,.5); --surface-solid:#141B2B;
-  --line:rgba(200,215,255,.08); --line-strong:rgba(200,215,255,.16);
-  --fg:#E9EDF6; --muted:#A3ADC4; --faint:#717C97;
-  --accent:#8098FF; --accent-fg:#0B101B; --accent-soft:rgba(128,152,255,.14);
-  --gain:#4FD993; --gain-soft:rgba(79,217,147,.13); --loss:#FF7479; --loss-soft:rgba(255,116,121,.13);
-  --hold:#EDB45C; --hold-soft:rgba(237,180,92,.14);
-  --row-hover:rgba(128,152,255,.05); --foot:#182033;
-  --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.35);
   color-scheme:dark;
-}}
+}
+:root[data-palette="navy"]{
+  --bg:#040B1C; --bg-glow1:rgba(40,110,255,.30); --bg-glow2:rgba(80,190,255,.14);
+  --card:#0A1631; --card-2:#102142; --card-3:#172C55;
+  --line:rgba(150,190,255,.08); --line-strong:rgba(150,190,255,.16);
+  --fg:#EAF2FF; --muted:#9DB0D3; --faint:#647AA0;
+  --accent:#3D86FF; --accent-2:#5BC8FF; --accent-soft:rgba(61,134,255,.17); --accent-line:rgba(61,134,255,.5);
+}
+:root[data-palette="violet"]{
+  --bg:#0B0716; --bg-glow1:rgba(168,120,255,.28); --bg-glow2:rgba(110,90,255,.16);
+  --card:#160F2B; --card-2:#20173B; --card-3:#2A1F4B;
+  --line:rgba(210,180,255,.08); --line-strong:rgba(210,180,255,.16);
+  --fg:#F3EEFF; --muted:#B5A8D6; --faint:#7D6FA3;
+  --accent:#A47BFF; --accent-2:#6C63FF; --accent-soft:rgba(164,123,255,.17); --accent-line:rgba(164,123,255,.5);
+}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-html{-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{-webkit-text-size-adjust:100%;background:var(--bg)}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);transition:background .4s}
 .bg{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
-.bg::before,.bg::after{content:"";position:absolute;border-radius:50%;filter:blur(90px);opacity:.55}
-.bg::before{width:560px;height:560px;background:var(--blob1);top:-220px;left:-160px;animation:drift 14s ease-in-out infinite alternate}
-.bg::after{width:480px;height:480px;background:var(--blob2);top:120px;right:-200px;animation:drift 18s ease-in-out infinite alternate-reverse}
-@keyframes drift{to{transform:translate(60px,40px) scale(1.08)}}
-.wrap{position:relative;z-index:1;max-width:960px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:22px 120px;display:flex;flex-direction:column;gap:22px}
+.bg::before,.bg::after{content:"";position:absolute;border-radius:50%;filter:blur(100px)}
+.bg::before{width:620px;height:620px;background:var(--bg-glow1);top:-260px;left:-200px;animation:drift 16s ease-in-out infinite alternate}
+.bg::after{width:520px;height:520px;background:var(--bg-glow2);top:220px;right:-240px;animation:drift 20s ease-in-out infinite alternate-reverse}
+@keyframes drift{to{transform:translate(70px,50px) scale(1.1)}}
+.wrap{position:relative;z-index:1;max-width:960px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:18px 120px;display:flex;flex-direction:column;gap:20px}
 .num{font-variant-numeric:tabular-nums lining-nums;font-feature-settings:"tnum" 1,"lnum" 1}
 button,input{font:inherit;color:inherit}
-button{cursor:pointer}
+button{cursor:pointer;-webkit-tap-highlight-color:transparent}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .tone-gain{color:var(--gain)} .tone-loss{color:var(--loss)} .tone-zero{color:var(--fg)}
+.card{background:linear-gradient(160deg,var(--card-2) 0%,var(--card) 70%);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
 
 /* header */
-.top{display:flex;align-items:center;gap:10px}
-.logo{width:36px;height:36px;border-radius:10px;background:var(--accent);display:grid;place-items:center;flex:none}
-.logo svg{width:20px;height:20px}
-.top h1{font-size:18px;font-weight:700;margin:0;line-height:1.25}
+.top{display:flex;align-items:center;gap:12px}
+.logo{width:44px;height:44px;border-radius:50%;background:linear-gradient(140deg,var(--accent),var(--accent-2));display:grid;place-items:center;flex:none;box-shadow:0 8px 24px -8px var(--accent)}
+.logo svg{width:22px;height:22px}
+.top h1{font-size:17px;font-weight:700;margin:0;line-height:1.25}
 .top .sub{font-size:12px;color:var(--muted)}
 .menu{margin-left:auto;position:relative}
-.menu>summary{list-style:none;border:1px solid var(--line-strong);background:var(--surface-2);padding:6px 12px;border-radius:999px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer}
+.menu>summary{list-style:none;display:flex;align-items:center;gap:8px;background:var(--card-2);border:1px solid var(--line);padding:9px 16px;border-radius:999px;font-size:13.5px;font-weight:600;color:var(--fg);cursor:pointer;transition:background .2s}
+.menu>summary:hover{background:var(--card-3)}
 .menu>summary::-webkit-details-marker{display:none}
-.menu[open]>summary{color:var(--fg);border-color:var(--fg)}
-.menu-pop{position:absolute;right:0;top:calc(100% + 8px);z-index:25;min-width:240px;padding:6px;border-radius:var(--r);background:var(--surface-solid);border:1px solid var(--line);box-shadow:var(--shadow);display:flex;flex-direction:column}
-.menu-pop button{border:0;background:transparent;text-align:left;padding:10px 12px;border-radius:var(--r-sm);font-size:14px}
+.menu>summary svg{width:16px;height:16px;color:var(--muted)}
+.menu-pop{position:absolute;right:0;top:calc(100% + 10px);z-index:25;min-width:260px;padding:8px;border-radius:var(--r-md);background:var(--card-2);border:1px solid var(--line-strong);box-shadow:var(--shadow);display:flex;flex-direction:column;animation:pop .2s cubic-bezier(.2,.9,.25,1)}
+@keyframes pop{from{transform:translateY(-6px) scale(.98)}}
+.menu-pop button{border:0;background:transparent;text-align:left;padding:10px 12px;border-radius:var(--r-sm);font-size:14px;color:var(--fg)}
 .menu-pop button small{display:block;font-size:12px;color:var(--muted)}
-.menu-pop button:hover{background:var(--bg)}
+.menu-pop button:hover{background:var(--card-3)}
+.menu-pop hr{border:0;border-top:1px solid var(--line);margin:6px 8px}
+.pal{padding:6px 12px 8px}
+.pal-k{font-size:12px;color:var(--muted);margin-bottom:8px}
+.pal-row{display:flex;gap:8px}
+.pal-row button{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;padding:8px 4px;border-radius:var(--r-sm);border:1px solid var(--line);background:var(--card);font-size:12px;color:var(--muted)}
+.pal-row button i{width:28px;height:28px;border-radius:50%;display:block}
+.pal-row button[aria-checked="true"]{border-color:var(--accent);color:var(--fg);background:var(--accent-soft)}
+.sync{display:inline-flex;align-items:center;gap:6px}
+.sync i{width:7px;height:7px;border-radius:50%;background:var(--gain);box-shadow:0 0 8px var(--gain)}
+.sync[data-s="busy"] i{background:var(--accent);box-shadow:0 0 8px var(--accent)}
+.sync[data-s="off"] i{background:var(--hold);box-shadow:none}
+.sync[data-s="local"] i{background:var(--faint);box-shadow:none}
 
-.banner{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 16px;padding:12px 16px;border-radius:var(--r);background:var(--accent-soft);border:1px dashed color-mix(in srgb,var(--accent) 38%,transparent);font-size:14px}
+.banner{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 16px;padding:14px 16px;border-radius:var(--r-md);background:var(--accent-soft);border:1px solid var(--accent-line);font-size:14px}
 .banner b{font-weight:600}
 
 /* hero */
-.hero{padding:6px 2px 0;animation:fadeup .5s cubic-bezier(.2,.8,.2,1)}
-@keyframes fadeup{from{transform:translateY(10px)}}
-.eyebrow{font-size:14px;color:var(--muted);font-weight:500}
-.big-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:4px}
-.big{font-size:clamp(40px,9vw,60px);font-weight:700;line-height:1.08;letter-spacing:-.02em}
-.pill{display:inline-flex;align-items:center;padding:5px 12px;border-radius:999px;font-size:14px;font-weight:600;white-space:nowrap}
-.pill.gain{background:var(--gain-soft);color:var(--gain)} .pill.loss{background:var(--loss-soft);color:var(--loss)} .pill.zero{background:var(--surface-2);color:var(--muted);border:1px solid var(--line)}
-.split{display:flex;flex-wrap:wrap;gap:4px 18px;margin-top:8px;font-size:14px;color:var(--muted)}
+.hero{padding:10px 4px 0;animation:fadeup .6s cubic-bezier(.2,.8,.2,1)}
+@keyframes fadeup{from{transform:translateY(12px)}}
+.eyebrow{font-size:14.5px;color:var(--muted);font-weight:500}
+.big-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:2px}
+.big{font-size:clamp(42px,10vw,64px);font-weight:700;line-height:1.08;letter-spacing:-.025em}
+.big.tone-gain,.big.tone-loss,.big.tone-zero{color:var(--fg)}
+.pill{display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border-radius:999px;font-size:13.5px;font-weight:600;white-space:nowrap}
+.pill.gain{background:var(--gain-soft);color:var(--gain)} .pill.loss{background:var(--loss-soft);color:var(--loss)} .pill.zero{background:var(--card-2);color:var(--muted)}
+#roiPill{background:var(--accent);color:var(--accent-fg);box-shadow:0 6px 18px -6px var(--accent)}
+#roiPill.loss{background:var(--loss)}
+.subline{display:flex;flex-wrap:wrap;align-items:center;gap:6px 16px;margin-top:8px;font-size:14px;color:var(--muted)}
+.subline .up{display:inline-flex;align-items:center;gap:4px;font-weight:600}
+.subline .up svg{width:14px;height:14px}
+.split{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:14px;color:var(--muted)}
 .split b{font-weight:600;margin-left:6px}
-.facts{display:flex;flex-wrap:wrap;gap:14px 40px;margin-top:22px;padding-top:18px;border-top:1px solid var(--line-strong)}
-.fact .k{font-size:13px;color:var(--muted)}
-.fact .v{font-size:18px;font-weight:600;margin-top:1px}
+
+/* holdings card with quick actions */
+.hold-card{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 22px;flex-wrap:wrap}
+.hold-card .k{font-size:14px;color:var(--muted)}
+.hold-card .v{font-size:clamp(24px,5.5vw,30px);font-weight:700;letter-spacing:-.01em;line-height:1.2}
+.quick-acts{display:flex;gap:18px}
+.qa{border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--fg);font-size:13px;font-weight:500;padding:0}
+.qa span.ic{width:52px;height:52px;border-radius:50%;background:var(--card-3);display:grid;place-items:center;transition:transform .2s,background .2s}
+.qa span.ic svg{width:21px;height:21px}
+.qa:hover span.ic{background:var(--accent);transform:translateY(-2px)}
+.qa:active span.ic{transform:scale(.94)}
+
+/* chart */
+.chart-card{padding:18px 0 14px;overflow:hidden}
+.chart-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:0 22px;flex-wrap:wrap}
+.chart-head h3{margin:0;font-size:15px;font-weight:600}
+.chart-head .aside{font-size:13px;color:var(--muted)}
+.chart-box{position:relative;height:210px;margin-top:10px;touch-action:pan-y}
+.chart-box svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.chart-dot{position:absolute;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:var(--fg);border:3px solid var(--accent);box-shadow:0 0 0 6px var(--accent-soft);pointer-events:none;transition:left .08s,top .08s}
+.chart-end{position:absolute;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;background:var(--fg);box-shadow:0 0 0 5px color-mix(in srgb,var(--fg) 25%,transparent);pointer-events:none;animation:beat 2.4s ease-in-out infinite}
+@keyframes beat{50%{box-shadow:0 0 0 9px color-mix(in srgb,var(--fg) 8%,transparent)}}
+.chart-vline{position:absolute;top:0;bottom:0;width:1px;background:linear-gradient(var(--line-strong),transparent);pointer-events:none}
+.chart-tip{position:absolute;transform:translate(-50%,0);padding:8px 12px;border-radius:12px;background:color-mix(in srgb,var(--card-3) 92%,transparent);border:1px solid var(--line-strong);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);font-size:12px;color:var(--muted);white-space:nowrap;pointer-events:none}
+.chart-tip b{display:block;font-size:15px;color:var(--fg)}
+.chart-empty{display:grid;place-items:center;height:100%;color:var(--muted);font-size:14px;text-align:center;padding:0 24px}
+.ranges{display:flex;justify-content:space-between;gap:4px;padding:6px 16px 0}
+.ranges button{border:0;background:none;padding:7px 14px;border-radius:999px;font-size:13px;font-weight:600;color:var(--muted);transition:background .2s,color .2s}
+.ranges button[aria-pressed="true"]{background:var(--card-3);color:var(--fg)}
 
 /* first-run */
-.welcome{display:flex;flex-direction:column;align-items:flex-start;gap:10px;padding:36px 28px;border-radius:16px;background:var(--surface-solid);border:1px solid var(--line);box-shadow:var(--shadow);animation:fadeup .5s cubic-bezier(.2,.8,.2,1)}
-.welcome .w-ic{width:48px;height:48px;border-radius:13px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center}
-.welcome .w-ic svg{width:24px;height:24px}
-.welcome h2{margin:6px 0 0;font-size:24px;font-weight:700}
+.welcome{display:flex;flex-direction:column;align-items:flex-start;gap:10px;padding:36px 28px;animation:fadeup .5s cubic-bezier(.2,.8,.2,1)}
+.welcome .w-ic{width:56px;height:56px;border-radius:50%;background:linear-gradient(140deg,var(--accent),var(--accent-2));color:#fff;display:grid;place-items:center;box-shadow:0 10px 30px -10px var(--accent)}
+.welcome .w-ic svg{width:26px;height:26px}
+.welcome h2{margin:8px 0 0;font-size:26px;font-weight:700}
 .welcome p{margin:0;color:var(--muted);max-width:46ch}
-.welcome .w-acts{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
-.welcome .submit{padding:11px 22px}
+.welcome .w-acts{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+.welcome .submit{padding:13px 26px}
 
 /* sections */
 .sec-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
-.sec-head h2{margin:0;font-size:19px;font-weight:700}
+.sec-head h2{margin:0;font-size:20px;font-weight:700}
 .sec-head .aside{font-size:13px;color:var(--muted)}
 .sec-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
-.tabs{display:flex;gap:6px;flex-wrap:wrap}
-.tabs button{border:1px solid var(--line-strong);background:var(--surface-2);padding:7px 15px;border-radius:999px;font-size:14px;font-weight:500;color:var(--muted);transition:background .2s,color .2s,border-color .2s,transform .15s}
-.tabs button:active{transform:scale(.96)}
-.tabs button[aria-pressed="true"]{background:var(--fg);border-color:var(--fg);color:var(--bg)}
-.tabs .c{font-size:12.5px;opacity:.65;margin-left:6px}
-.pillbtn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line-strong);background:var(--surface-2);padding:7px 14px;border-radius:999px;font-size:14px;font-weight:600;color:var(--accent);transition:border-color .2s,transform .15s}
-.pillbtn:hover{border-color:var(--accent)}
+.tabs{display:inline-flex;gap:2px;padding:4px;border-radius:999px;background:var(--card);border:1px solid var(--line)}
+.tabs button{border:0;background:transparent;padding:9px 18px;border-radius:999px;font-size:14px;font-weight:600;color:var(--muted);transition:background .25s,color .25s,box-shadow .25s}
+.tabs button[aria-pressed="true"]{background:var(--accent);color:var(--accent-fg);box-shadow:0 6px 18px -8px var(--accent)}
+.tabs .c{font-size:12.5px;opacity:.7;margin-left:6px}
+.pillbtn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line-strong);background:var(--card);padding:9px 16px;border-radius:999px;font-size:14px;font-weight:600;color:var(--fg);transition:border-color .2s,background .2s,transform .15s}
+.pillbtn:hover{border-color:var(--accent-line);background:var(--card-2)}
 .pillbtn:active{transform:scale(.96)}
-.pillbtn svg{width:17px;height:17px}
+.pillbtn svg{width:17px;height:17px;color:var(--accent)}
 .note-line{font-size:12.5px;color:var(--faint);line-height:1.6;margin-top:-6px}
 
-/* table */
-.tblwrap{overflow-x:auto;border-radius:var(--r);border:1px solid var(--line);background:var(--surface-solid);box-shadow:var(--shadow)}
+/* list (table) */
+.tblwrap{overflow-x:auto;border-radius:var(--r);border:1px solid var(--line);background:linear-gradient(170deg,var(--card-2),var(--card) 60%);box-shadow:var(--shadow)}
 .swap .tblwrap{animation:swapin .4s cubic-bezier(.2,.8,.2,1)}
 @keyframes swapin{from{transform:translateX(14px)}}
 table.tbl{width:100%;border-collapse:collapse;font-size:14.5px}
-.tbl th,.tbl td{padding:13px 16px;text-align:left;white-space:nowrap;border-bottom:1px solid var(--line);vertical-align:middle}
-.tbl thead th{font-size:12.5px;font-weight:600;color:var(--muted);padding-block:11px}
+.tbl th,.tbl td{padding:14px 18px;text-align:left;white-space:nowrap;border-bottom:1px solid var(--line);vertical-align:middle}
+.tbl thead th{font-size:12.5px;font-weight:500;color:var(--faint);padding-block:14px 10px}
 .tbl .r{text-align:right}
 .tbl tbody tr{transition:background .15s}
-.tbl tbody tr:hover{background:var(--row-hover)}
+.tbl tbody tr:hover{background:color-mix(in srgb,var(--card-3) 55%,transparent)}
 .tbl tr.tap{cursor:pointer}
 .tbl .main{font-weight:600}
 .tbl .sub{font-size:12.5px;color:var(--muted);margin-top:1px}
 .tbl .symn{font-weight:700;font-size:15px;display:flex;align-items:center;gap:8px}
+.tbl .sym-wrap{display:flex;align-items:center;gap:12px}
 .tbl .muted{color:var(--faint)}
-.tbl tfoot td{font-weight:600;background:var(--foot);border-bottom:0}
-.chip{font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent);white-space:nowrap}
-.chip.th{background:var(--gain-soft);color:var(--gain)}
+.tbl tfoot td{font-weight:600;background:color-mix(in srgb,var(--card-3) 50%,transparent);border-bottom:0}
+.av{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;flex:none;font-size:13px;font-weight:700;color:#fff;letter-spacing:.02em}
+.chip{font-size:11px;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--card-3);color:var(--muted);white-space:nowrap}
+.chip.th{color:var(--gain);background:var(--gain-soft)}
 .chip.hold{background:var(--hold-soft);color:var(--hold)}
 .chip.est{background:var(--hold-soft);color:var(--hold)}
 .chip.act{background:var(--gain-soft);color:var(--gain)}
+.plpill{display:inline-block;padding:5px 11px;border-radius:10px;font-weight:600;white-space:nowrap}
+.plpill.gain{background:var(--gain-soft);color:var(--gain)} .plpill.loss{background:var(--loss-soft);color:var(--loss)} .plpill.zero{background:var(--card-3)}
 .sortb{border:0;background:none;padding:0;font:inherit;color:inherit;display:inline-flex;align-items:center;gap:4px}
 .sortb:hover{color:var(--fg)}
 th[aria-sort] .sortb{color:var(--fg)}
 .arr{font-size:9px}
 .acts{display:flex;gap:6px;justify-content:flex-end}
-.mini{border:1px solid var(--line-strong);background:transparent;padding:5px 12px;border-radius:7px;font-size:13px;font-weight:600;color:var(--fg);transition:border-color .15s,color .15s}
-.mini:hover{border-color:var(--accent);color:var(--accent)}
+.mini{border:1px solid var(--line-strong);background:transparent;padding:6px 14px;border-radius:999px;font-size:13px;font-weight:600;color:var(--fg);transition:border-color .15s,background .15s}
+.mini:hover{border-color:var(--accent-line);background:var(--card-3)}
 .mini.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
-.mini.primary:hover{color:var(--accent-fg);filter:brightness(1.08)}
+.mini.primary:hover{filter:brightness(1.1);background:var(--accent)}
 .m-only,.m-btn,.msub{display:none}
 .empty{padding:32px 16px;text-align:center;color:var(--muted);font-size:14px}
 
 /* scan zone */
-.drop{border:1.5px dashed color-mix(in srgb,var(--accent) 40%,transparent);border-radius:var(--r);background:var(--accent-soft);transition:background .2s,border-color .2s}
-.drop.over{background:color-mix(in srgb,var(--accent) 18%,transparent);border-color:var(--accent)}
-.drop[data-state="error"]{border-color:color-mix(in srgb,var(--loss) 45%,transparent);background:var(--loss-soft)}
-.drop[data-state="done"]{border-style:solid;border-color:color-mix(in srgb,var(--gain) 40%,transparent);background:var(--gain-soft)}
+.drop{border:1.5px dashed var(--accent-line);border-radius:var(--r-md);background:var(--accent-soft);transition:background .2s,border-color .2s}
+.drop.over{background:color-mix(in srgb,var(--accent) 24%,transparent);border-color:var(--accent)}
+.drop[data-state="error"]{border-color:color-mix(in srgb,var(--loss) 50%,transparent);background:var(--loss-soft)}
+.drop[data-state="done"]{border-style:solid;border-color:color-mix(in srgb,var(--gain) 45%,transparent);background:var(--gain-soft)}
 .drop-btn,.drop-row{display:flex;align-items:center;gap:12px;width:100%;padding:12px 14px;text-align:left}
 .drop-btn{border:0;background:transparent;color:var(--fg)}
-.drop-ic{width:40px;height:40px;border-radius:10px;background:var(--surface-solid);display:grid;place-items:center;color:var(--accent);flex:none}
+.drop-ic{width:42px;height:42px;border-radius:50%;background:var(--card-3);display:grid;place-items:center;color:var(--accent);flex:none}
 .drop[data-state="error"] .drop-ic{color:var(--loss)}
 .drop-ic svg{width:20px;height:20px}
 .drop-tx{flex:1;min-width:0}
 .drop-tx b{display:block;font-size:14.5px;font-weight:600}
 .drop-tx small{display:block;font-size:12.5px;color:var(--muted);line-height:1.45}
-.drop img{width:40px;height:40px;border-radius:8px;object-fit:cover;object-position:top;flex:none;border:1px solid var(--line)}
-.spin{width:22px;height:22px;border-radius:50%;border:2.5px solid color-mix(in srgb,var(--accent) 20%,transparent);border-top-color:var(--accent);animation:spin .8s linear infinite;flex:none;margin:0 9px}
+.drop img{width:42px;height:42px;border-radius:10px;object-fit:cover;object-position:top;flex:none;border:1px solid var(--line)}
+.spin{width:22px;height:22px;border-radius:50%;border:2.5px solid var(--accent-soft);border-top-color:var(--accent);animation:spin .8s linear infinite;flex:none;margin:0 10px}
 @keyframes spin{to{transform:rotate(360deg)}}
 .filled{animation:filled 1.8s ease}
 @keyframes filled{0%,45%{border-color:var(--gain);box-shadow:0 0 0 3px color-mix(in srgb,var(--gain) 28%,transparent)}}
@@ -168,99 +220,107 @@ th[aria-sort] .sortb{color:var(--fg)}
 /* sign-in gate */
 .gate{position:fixed;inset:0;z-index:50;overflow:auto;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:calc(24px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(24px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
 .gate .bg{position:absolute}
-.gate-card{position:relative;z-index:1;width:100%;max-width:400px;display:flex;flex-direction:column;gap:18px;animation:fadeup .5s cubic-bezier(.2,.8,.2,1)}
+.gate-card{position:relative;z-index:1;width:100%;max-width:400px;display:flex;flex-direction:column;gap:20px;animation:fadeup .5s cubic-bezier(.2,.8,.2,1)}
 .gate-brand{display:flex;flex-direction:column;align-items:flex-start;gap:12px}
-.gate-brand .logo{width:48px;height:48px;border-radius:13px}
-.gate-brand .logo svg{width:26px;height:26px}
-.gate-brand h1{margin:0;font-size:28px;font-weight:700;line-height:1.2;letter-spacing:-.01em}
+.gate-brand .logo{width:56px;height:56px}
+.gate-brand .logo svg{width:28px;height:28px}
+.gate-brand h1{margin:0;font-size:30px;font-weight:700;line-height:1.2;letter-spacing:-.01em}
 .gate-brand p{margin:0;color:var(--muted);font-size:14.5px}
-.gate-form{display:flex;flex-direction:column;gap:14px;padding:22px;border-radius:16px;background:var(--surface-solid);border:1px solid var(--line);box-shadow:var(--shadow)}
-.seg{display:grid;grid-template-columns:1fr 1fr;padding:3px;border-radius:10px;background:var(--bg)}
-.seg button{border:0;background:transparent;padding:8px;border-radius:8px;font-size:14px;font-weight:600;color:var(--muted);transition:background .2s,color .2s}
-.seg button[aria-selected="true"]{background:var(--surface-solid);color:var(--fg);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.gate-form{display:flex;flex-direction:column;gap:14px;padding:22px;border-radius:var(--r);background:linear-gradient(160deg,var(--card-2),var(--card));border:1px solid var(--line);box-shadow:var(--shadow)}
+.seg{display:grid;grid-template-columns:1fr 1fr;padding:4px;border-radius:999px;background:var(--card)}
+.seg button{border:0;background:transparent;padding:9px;border-radius:999px;font-size:14px;font-weight:600;color:var(--muted);transition:background .25s,color .25s}
+.seg button[aria-selected="true"]{background:var(--accent);color:var(--accent-fg)}
 .pin{letter-spacing:.3em}
 .gate-note{padding:12px 14px;border-radius:var(--r-sm);background:var(--hold-soft);color:var(--fg);font-size:13.5px;line-height:1.55}
 .gate-note b{display:block}
 .linkbtn{border:0;background:none;padding:4px 0;color:var(--muted);font-size:13.5px;text-decoration:underline;text-underline-offset:3px;align-self:center}
 .linkbtn:hover{color:var(--fg)}
-.menu-pop hr{border:0;border-top:1px solid var(--line);margin:4px 6px}
-.sync{display:inline-flex;align-items:center;gap:6px}
-.sync i{width:7px;height:7px;border-radius:50%;background:var(--gain)}
-.sync[data-s="busy"] i{background:var(--accent)}
-.sync[data-s="off"] i{background:var(--hold)}
-.sync[data-s="local"] i{background:var(--faint)}
 
 /* FAB + sheets */
-.fab{position:fixed;z-index:20;right:calc(max(16px,env(safe-area-inset-right,0px)) + 4px);bottom:calc(20px + env(safe-area-inset-bottom,0px));border:0;background:var(--accent);color:var(--accent-fg);padding:14px 20px;border-radius:14px;font-weight:600;font-size:15px;display:flex;align-items:center;gap:8px;box-shadow:0 8px 24px color-mix(in srgb,var(--accent) 40%,transparent);transition:transform .2s}
+.fab{position:fixed;z-index:20;right:calc(max(16px,env(safe-area-inset-right,0px)) + 4px);bottom:calc(20px + env(safe-area-inset-bottom,0px));border:0;background:linear-gradient(140deg,var(--accent),var(--accent-2));color:var(--accent-fg);padding:15px 22px;border-radius:999px;font-weight:600;font-size:15px;display:flex;align-items:center;gap:8px;box-shadow:0 12px 30px -8px var(--accent);transition:transform .2s}
 .fab:hover{transform:translateY(-2px)}
 .fab svg{width:18px;height:18px}
-.backdrop{position:fixed;inset:0;z-index:30;background:rgba(8,12,24,.5);display:flex;align-items:flex-end;justify-content:center;padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px);animation:fadein .2s}
-@keyframes fadein{from{background:rgba(8,12,24,0)}}
-.sheet{width:100%;max-width:500px;max-height:92vh;overflow:auto;background:var(--surface-solid);border-radius:18px 18px 0 0;padding:20px max(20px,env(safe-area-inset-right,0px)) calc(20px + env(safe-area-inset-bottom,0px)) max(20px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:16px;animation:sheet .38s cubic-bezier(.2,.9,.25,1)}
+.backdrop{position:fixed;inset:0;z-index:30;background:rgba(2,3,12,.6);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px);animation:fadein .2s}
+@keyframes fadein{from{background:rgba(2,3,12,0)}}
+.sheet{width:100%;max-width:500px;max-height:92vh;overflow:auto;background:var(--card);border:1px solid var(--line);border-bottom:0;border-radius:28px 28px 0 0;padding:22px max(20px,env(safe-area-inset-right,0px)) calc(22px + env(safe-area-inset-bottom,0px)) max(20px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:16px;animation:sheet .38s cubic-bezier(.2,.9,.25,1)}
 @keyframes sheet{from{transform:translateY(48px)}}
-@media (min-width:700px){.backdrop{align-items:center}.sheet{border-radius:16px}}
+@media (min-width:700px){.backdrop{align-items:center}.sheet{border-radius:28px;border-bottom:1px solid var(--line)}}
 .sheet-head{display:flex;justify-content:space-between;align-items:center;gap:12px}
-.sheet-head h2{margin:0;font-size:18px}
-.x{border:0;background:var(--bg);width:34px;height:34px;border-radius:9px;font-size:20px;line-height:1;color:var(--muted);flex:none}
+.sheet-head h2{margin:0;font-size:20px}
+.x{border:0;background:var(--card-3);width:38px;height:38px;border-radius:50%;font-size:20px;line-height:1;color:var(--muted);flex:none}
 .frow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .field{display:flex;flex-direction:column;gap:6px;min-width:0}
 .fl{font-size:13px;color:var(--muted);font-weight:500}
-.field input,.pair input,.fxrow input{width:100%;padding:11px 12px;border-radius:var(--r-sm);border:1px solid var(--line-strong);background:var(--bg);font-size:16px}
+.field input,.pair input,.fxrow input{width:100%;padding:13px 14px;border-radius:var(--r-sm);border:1px solid transparent;background:var(--card-2);font-size:16px;color:var(--fg)}
+.field input::placeholder,.pair input::placeholder{color:var(--faint)}
 .field input:focus,.pair input:focus,.fxrow input:focus{border-color:var(--accent);outline:none;box-shadow:0 0 0 3px var(--accent-soft)}
+input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.8)}
 .upper{text-transform:uppercase}
 .upper::placeholder{text-transform:none}
 .affix{position:relative;display:block;min-width:0}
-.affix input{padding-right:50px}
-.affix em{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-style:normal;font-size:13px;font-weight:600;color:var(--faint);pointer-events:none}
+.affix input{padding-right:52px}
+.affix em{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-style:normal;font-size:13px;font-weight:600;color:var(--faint);pointer-events:none}
 .pair{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:8px}
 .pair.one{grid-template-columns:1fr}
-.pair .eq{color:var(--faint);font-size:16px}
+.pair .eq{width:30px;height:30px;border-radius:50%;background:var(--accent);color:var(--accent-fg);display:grid;place-items:center;font-size:14px;font-weight:700}
 .fxrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13.5px;color:var(--muted)}
-.fxrow input{width:96px;padding:8px 10px;font-size:15px;text-align:right}
+.fxrow input{width:100px;padding:9px 12px;font-size:15px;text-align:right}
 .fxrow small{flex-basis:100%;font-size:12px;color:var(--faint)}
 .quick{display:flex;flex-wrap:wrap;gap:6px}
-.quick button{border:1px solid var(--line-strong);background:transparent;padding:4px 12px;border-radius:999px;font-size:13px;font-weight:600;color:var(--fg);transition:background .15s,border-color .15s}
-.quick button:hover{border-color:var(--accent);color:var(--accent)}
+.quick button{border:1px solid var(--line-strong);background:transparent;padding:5px 13px;border-radius:999px;font-size:13px;font-weight:600;color:var(--fg);transition:background .15s,border-color .15s}
+.quick button:hover{border-color:var(--accent-line);background:var(--card-2)}
 .quick button[aria-checked="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
-.choice{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
-.choice button{border:1px solid var(--line-strong);background:transparent;padding:10px 8px;border-radius:var(--r-sm);font-size:14px;font-weight:600;line-height:1.25;transition:all .15s}
-.choice button small{display:block;font-size:11.5px;font-weight:500;color:var(--muted)}
-.choice button[aria-checked="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
-.choice button[aria-checked="true"] small{color:var(--accent)}
-.ctx{padding:12px 14px;border-radius:var(--r-sm);background:var(--bg);font-size:14px;color:var(--muted)}
+.choice{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:4px;border-radius:var(--r-md);background:var(--card-2)}
+.choice button{border:0;background:transparent;padding:10px 8px;border-radius:var(--r-sm);font-size:14px;font-weight:600;line-height:1.25;color:var(--muted);transition:all .2s}
+.choice button small{display:block;font-size:11.5px;font-weight:500;color:var(--faint)}
+.choice button[aria-checked="true"]{background:var(--accent);color:var(--accent-fg)}
+.choice button[aria-checked="true"] small{color:color-mix(in srgb,var(--accent-fg) 80%,transparent)}
+.ctx{padding:14px 16px;border-radius:var(--r-md);background:var(--card-2);font-size:14px;color:var(--muted)}
 .ctx b{color:var(--fg)}
-.preview{padding:12px 14px;border-radius:var(--r-sm);background:var(--accent-soft);font-size:14px;display:flex;justify-content:space-between;align-items:center;gap:4px 12px;flex-wrap:wrap}
-.preview b{font-size:16px;text-align:right}
+.preview{padding:14px 16px;border-radius:var(--r-md);background:var(--card-2);font-size:14px;color:var(--muted);display:flex;justify-content:space-between;align-items:center;gap:4px 12px;flex-wrap:wrap}
+.preview b{font-size:18px;text-align:right;color:var(--fg)}
+.preview b.tone-gain{color:var(--gain)} .preview b.tone-loss{color:var(--loss)}
 .preview b small{display:block;font-size:12.5px;font-weight:500;color:var(--muted)}
 .hintline{font-size:12.5px;color:var(--faint);margin-top:-8px}
 .err{color:var(--loss);font-size:13.5px;margin:0}
-.submit{border:0;background:var(--accent);color:var(--accent-fg);padding:13px;border-radius:var(--r-sm);font-weight:600;font-size:15px}
+.submit{border:0;background:linear-gradient(140deg,var(--accent),var(--accent-2));color:var(--accent-fg);padding:15px;border-radius:999px;font-weight:600;font-size:15.5px;box-shadow:0 10px 26px -10px var(--accent);transition:transform .15s,filter .2s}
+.submit:hover{filter:brightness(1.08)}
+.submit:active{transform:scale(.98)}
 .submit:disabled{opacity:.6;cursor:default}
-.sheet-foot{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;padding-top:6px;border-top:1px solid var(--line)}
-.btn{border:1px solid transparent;background:transparent;padding:8px 12px;border-radius:var(--r-sm);font-weight:600;font-size:13.5px;color:var(--muted)}
-.btn:hover{background:var(--bg)}
+.sheet-foot{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;padding-top:8px;border-top:1px solid var(--line)}
+.btn{border:1px solid transparent;background:transparent;padding:9px 14px;border-radius:999px;font-weight:600;font-size:13.5px;color:var(--muted)}
+.btn:hover{background:var(--card-2);color:var(--fg)}
 .btn.danger{background:var(--loss);color:#fff}
 .btn.primary{background:var(--accent);color:var(--accent-fg)}
-.toast{position:fixed;z-index:40;left:50%;transform:translateX(-50%);bottom:calc(90px + env(safe-area-inset-bottom,0px));background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:10px;font-size:14px;box-shadow:var(--shadow);max-width:calc(100% - 32px);animation:toast .3s cubic-bezier(.2,.9,.25,1)}
+.toast{position:fixed;z-index:60;left:50%;transform:translateX(-50%);bottom:calc(92px + env(safe-area-inset-bottom,0px));background:var(--fg);color:var(--bg);padding:11px 18px;border-radius:999px;font-size:14px;font-weight:500;box-shadow:var(--shadow);max-width:calc(100% - 32px);animation:toast .3s cubic-bezier(.2,.9,.25,1)}
 @keyframes toast{from{transform:translate(-50%,12px)}}
 
 @media (max-width:640px){
-  .facts{gap:12px 28px}
+  .hold-card{padding:18px}
+  .quick-acts{gap:14px;width:100%;justify-content:space-between}
+  .qa span.ic{width:50px;height:50px}
+  .tabs{width:100%}
+  .tabs button{flex:1;padding:9px 8px}
   .d-only{display:none}
   .m-only{display:table-cell}
   .m-btn{display:inline-block}
   .msub{display:block}
-  .tbl th,.tbl td{padding:12px 10px;white-space:normal}
+  .tbl th,.tbl td{padding:13px 10px;white-space:normal}
   .tbl th:first-child,.tbl td:first-child{padding-left:14px}
   .tbl .plc{padding-right:14px}
   .tbl .symn{flex-wrap:wrap;gap:4px 6px}
+  .tbl .sym-wrap{gap:10px}
+  .av{width:34px;height:34px;font-size:11.5px}
   .tbl .main,.tbl .sub{white-space:nowrap}
+  .plpill{font-size:13px;padding:4px 8px}
   .mline{font-size:13.5px;font-weight:600;white-space:nowrap;line-height:1.6}
   .mk{display:inline-block;width:28px;font-size:12px;font-weight:500;color:var(--faint)}
   .fab span{display:none}
-  .fab{padding:16px;border-radius:16px}
+  .fab{padding:17px}
+  .chart-head{padding:0 18px}
+  .ranges{padding:6px 10px 0}
 }
-@media (max-width:380px){.frow{grid-template-columns:1fr}.choice{grid-template-columns:1fr}.pair{grid-template-columns:1fr}.pair .eq{display:none}}
+@media (max-width:380px){.frow{grid-template-columns:1fr}.choice{grid-template-columns:1fr}.pair{grid-template-columns:1fr}.pair .eq{display:none}.quick-acts{gap:8px}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -274,8 +334,14 @@ th[aria-sort] .sortb{color:var(--fg)}
       <div class="sub"><span class="sync" id="syncState" data-s="local"><i></i><span id="syncText">บันทึกไว้ในเบราว์เซอร์นี้</span></span></div>
     </div>
     <details class="menu" id="menu">
-      <summary id="menuLabel">เมนู</summary>
+      <summary><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span id="menuLabel">เมนู</span></summary>
       <div class="menu-pop">
+        <div class="pal"><div class="pal-k">โทนสี</div><div class="pal-row" role="radiogroup" aria-label="โทนสี">
+          <button type="button" role="radio" data-pal="indigo" aria-checked="true"><i style="background:linear-gradient(140deg,#7B6CFF,#3E8BFF)"></i>คราม-ม่วง</button>
+          <button type="button" role="radio" data-pal="navy" aria-checked="false"><i style="background:linear-gradient(140deg,#3D86FF,#5BC8FF)"></i>กรมท่า</button>
+          <button type="button" role="radio" data-pal="violet" aria-checked="false"><i style="background:linear-gradient(140deg,#A47BFF,#6C63FF)"></i>ม่วง</button>
+        </div></div>
+        <hr>
         <button type="button" id="exportBtn">ดาวน์โหลดไฟล์สำรอง<small>เก็บไว้ย้ายไปเครื่องอื่นหรือกันข้อมูลหาย</small></button>
         <button type="button" id="importBtn">นำเข้าไฟล์สำรอง<small>แทนที่ข้อมูลทั้งหมดด้วยไฟล์</small></button>
         <hr>
@@ -291,7 +357,7 @@ th[aria-sort] .sortb{color:var(--fg)}
     <div style="display:flex;gap:6px"><button type="button" class="btn" id="moveSkip">ไม่ต้อง</button><button type="button" class="btn primary" id="moveGo">ย้ายเข้าบัญชี</button></div>
   </div>
 
-  <section class="welcome" id="welcome" hidden>
+  <section class="welcome card" id="welcome" hidden>
     <div class="w-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5a2 2 0 0 1 2-2h11l3 3v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M8 9h8M8 13h8M8 17h5"/></svg></div>
     <h2>เริ่มจดรายการแรก</h2>
     <p>จดตอนซื้อ แล้วใส่ราคาขายทีหลัง ระบบจะคำนวณกำไร ROI และปันผลเป็นเงินบาทให้</p>
@@ -301,11 +367,24 @@ th[aria-sort] .sortb{color:var(--fg)}
   <section class="hero" id="heroSec" aria-label="สรุปผล">
     <div class="eyebrow">กำไร / ขาดทุนที่ขายแล้ว</div>
     <div class="big-row"><div class="big num" id="plBig">฿0.00</div><span class="pill num zero" id="roiPill" hidden></span></div>
-    <div class="split" id="split"></div>
-    <div class="facts">
-      <div class="fact"><div class="k">ปันผลที่ได้ (หลังหักภาษี)</div><div class="v num" id="fDiv">฿0.00</div></div>
-      <div class="fact"><div class="k">เงินที่ใช้ซื้อหุ้นที่ขายแล้ว</div><div class="v num" id="fSoldCost">฿0.00</div></div>
-      <div class="fact"><div class="k">ต้นทุนหุ้นที่ยังถือ</div><div class="v num" id="fHoldCost">฿0.00</div></div>
+    <div class="subline"><span class="up tone-gain" id="divLine"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg><b class="num" id="fDiv">฿0.00</b></span><span>ปันผลที่ได้ (หลังหักภาษี)</span></div>
+    <div class="split" id="split" style="margin-top:6px"></div>
+  </section>
+
+  <section class="hold-card card" id="holdCard" aria-label="หุ้นที่ยังถือ">
+    <div><div class="k">ต้นทุนหุ้นที่ยังถือ</div><div class="v num" id="fHoldCost">฿0.00</div></div>
+    <div class="quick-acts">
+      <button type="button" class="qa" data-open-add><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>จดซื้อ</button>
+      <button type="button" class="qa" data-scan-pick="main"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2M8 12h8"/></svg></span>อ่านภาพ</button>
+      <button type="button" class="qa" id="qaDiv"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M14.5 9.5c-.4-.9-1.4-1.5-2.5-1.5-1.4 0-2.5.8-2.5 2s1.1 1.6 2.5 2 2.5.8 2.5 2-1.1 2-2.5 2c-1.1 0-2.1-.6-2.5-1.5M12 6.5V8M12 16v1.5"/></svg></span>ปันผล</button>
+    </div>
+  </section>
+
+  <section class="chart-card card" id="chartCard" aria-labelledby="chartTitle">
+    <div class="chart-head"><h3 id="chartTitle">กำไรสะสมจากที่ขาย</h3><span class="aside">ใช้เงินซื้อไป <span class="num" id="fSoldCost">฿0.00</span></span></div>
+    <div class="chart-box" id="chartBox"></div>
+    <div class="ranges" role="group" aria-label="ช่วงเวลา">
+      <button type="button" data-range="1M" aria-pressed="false">1M</button><button type="button" data-range="3M" aria-pressed="false">3M</button><button type="button" data-range="6M" aria-pressed="false">6M</button><button type="button" data-range="1Y" aria-pressed="false">1Y</button><button type="button" data-range="ALL" aria-pressed="true">ALL</button>
     </div>
   </section>
 
@@ -315,7 +394,6 @@ th[aria-sort] .sortb{color:var(--fg)}
       <button type="button" data-f="hold" aria-pressed="false">ยังถืออยู่<span class="c num" id="cHold"></span></button>
       <button type="button" data-f="sold" aria-pressed="false">ขายแล้ว<span class="c num" id="cSold"></span></button>
     </div>
-    <button type="button" class="pillbtn" data-scan-pick="main"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg>อ่านจากภาพ</button>
   </div>
   <div id="list"></div>
 
@@ -587,7 +665,7 @@ function scheduleDividends(){clearTimeout(divTimer);divTimer=setTimeout(()=>fetc
 function render(){
   const L=lots(), sample=isSample();
   const empty=!L.length;
-  $("heroSec").hidden=empty; $("tradeTools").hidden=empty; $("divSec").hidden=empty; $("welcome").hidden=!empty;
+  $("heroSec").hidden=empty; $("holdCard").hidden=empty; $("chartCard").hidden=empty; $("tradeTools").hidden=empty; $("divSec").hidden=empty; $("welcome").hidden=!empty;
   const S=L.filter(sold), H=L.filter(l=>!sold(l));
   const pl=S.reduce((a,l)=>a+plT(l),0), sc=S.reduce((a,l)=>a+costT(l),0), hc=H.reduce((a,l)=>a+costT(l),0);
   const roi=sc>0?pl/sc:0;
@@ -598,6 +676,7 @@ function render(){
   $("split").innerHTML=!S.length?"ยังไม่มีรายการที่ขาย ใส่ราคาขายแล้วกำไรจะขึ้นที่นี่":ks.length>1?ks.map(k=>`<span>${MKT[k]||k}<b class="num tone-${tone(by[k])}">${baht(by[k],true)}</b></span>`).join(""):"";
   $("split").hidden=!!S.length&&ks.length<=1;
   $("fSoldCost").textContent=baht(sc); $("fHoldCost").textContent=baht(hc);
+  if(!empty)renderChart(L);
   $("cAll").textContent=L.length; $("cHold").textContent=H.length; $("cSold").textContent=S.length;
 
   const base=st.f==="hold"?H:st.f==="sold"?S:L;
@@ -630,12 +709,12 @@ function tableHTML(list,sample){
   </tr></thead><tbody>`+list.map(l=>{
     const s=sold(l), p=plT(l);
     return `<tr${sample?"":` class="tap" data-edit="${esc(l.id)}"`}>
-      <td><div class="symn">${esc(l.symbol)}${mktChip(l.ccy)}</div><div class="sub num">${nfq.format(l.qty)} หุ้น${l.note?" · "+esc(l.note):""}</div></td>
+      <td><div class="sym-wrap">${avatar(l.symbol)}<div><div class="symn">${esc(l.symbol)}${mktChip(l.ccy)}</div><div class="sub num">${nfq.format(l.qty)} หุ้น${l.note?" · "+esc(l.note):""}</div></div></div></td>
       <td class="m-only"><div class="mline num"><span class="mk">ซื้อ</span>${baht(buyT(l))}</div><div class="mline num"><span class="mk">ขาย</span>${s?baht(sellT(l)):`<span class="chip hold">ยังถือ</span>`}</div></td>
       <td class="r d-only"><div class="main num">${baht(buyT(l))}</div><div class="sub num">${orig(l.buyPrice,l.ccy)}${fdate(l.buyDate)}</div></td>
       <td class="r d-only">${s?`<div class="main num">${baht(sellT(l))}</div><div class="sub num">${orig(l.sellPrice,l.ccy)}${fdate(l.sellDate)}</div>`:`<span class="chip hold">ยังถือ</span>`}</td>
       <td class="r num d-only">${baht(costT(l))}</td>
-      <td class="r plc">${s?`<div class="main num tone-${tone(p)}">${baht(p,true)}</div><div class="sub num tone-${tone(p)}">${pct(pctT(l))}</div>`:(sample?`<span class="muted">—</span>`:`<button type="button" class="mini primary m-btn" data-sell="${esc(l.id)}">ขาย</button><span class="muted d-only">—</span>`)}</td>
+      <td class="r plc">${s?`<span class="plpill num ${tone(p)}">${baht(p,true)}</span><div class="sub num tone-${tone(p)}" style="margin-top:4px">${pct(pctT(l))}</div>`:(sample?`<span class="muted">—</span>`:`<button type="button" class="mini primary m-btn" data-sell="${esc(l.id)}">ขาย</button><span class="muted d-only">—</span>`)}</td>
       <td class="d-only">${sample?"":`<div class="acts">${s?"":`<button type="button" class="mini primary" data-sell="${esc(l.id)}">ขาย</button>`}<button type="button" class="mini" data-edit="${esc(l.id)}">แก้ไข</button></div>`}</td></tr>`;
   }).join("")+`</tbody>${foot?`<tfoot>${foot}</tfoot>`:""}</table></div>`;
 }
@@ -651,7 +730,7 @@ function divHTML(rows,sample){
     const dateLine=isAct?`ได้รับ ${fdate(r.date)}${r.exDate?` · XD ${fdate(r.exDate)}`:""}`:`XD ${fdate(r.exDate)}`;
     const attr=sample?"":isAct?` class="tap" data-div-edit="${esc(r.id)}"`:` class="tap" data-div-real="${esc(r.symbol)}|${r.exDate}|${r.native}|${r.ccy}"`;
     return `<tr${attr}>
-      <td><div class="symn">${esc(r.symbol)}${mktChip(r.ccy||"THB")}</div><div class="sub num msub">${dateLine}</div></td>
+      <td><div class="sym-wrap">${avatar(r.symbol)}<div><div class="symn">${esc(r.symbol)}${mktChip(r.ccy||"THB")}</div><div class="sub num msub">${dateLine}</div></div></div></td>
       <td class="d-only num">${dateLine}</td>
       <td class="r num d-only">${r.per!=null?(r.ccy==="THB"?"฿":(SYM[r.ccy]||""))+nf4.format(r.per):`<span class="muted">—</span>`}</td>
       <td class="r num d-only">${r.shares!=null?nfq.format(r.shares):`<span class="muted">—</span>`}</td>
@@ -659,6 +738,91 @@ function divHTML(rows,sample){
       <td class="d-only">${sample?"":`<div class="acts">${isAct?`<button type="button" class="mini" data-div-edit="${esc(r.id)}">แก้ไข</button>`:`<button type="button" class="mini" data-div-real="${esc(r.symbol)}|${r.exDate}|${r.native}|${r.ccy}">ใส่ยอดจริง</button>`}</div>`}</td></tr>`;
   }).join("")+`</tbody><tfoot><tr><td>รวมปันผล</td><td class="d-only"></td><td class="d-only"></td><td class="d-only"></td><td class="r plc num">${baht(tot)}</td><td class="d-only"></td></tr></tfoot></table></div>`;
 }
+
+/* ---------- avatar ---------- */
+const AV_HUES=[[252,222],[214,190],[276,246],[198,232],[318,282],[160,200],[30,350]];
+function avatar(sym){
+  let h=0; for(const ch of String(sym))h=(h*31+ch.charCodeAt(0))>>>0;
+  const [a,b]=AV_HUES[h%AV_HUES.length];
+  const t=String(sym).replace(/\..*$/,"").slice(0,sym.length>4?3:4);
+  return `<span class="av" aria-hidden="true" style="background:linear-gradient(140deg,hsl(${a} 70% 58%),hsl(${b} 72% 46%));font-size:${t.length>3?10.5:12}px">${esc(t)}</span>`;
+}
+
+/* ---------- palette ---------- */
+function setPalette(p){
+  document.documentElement.dataset.palette=p;
+  document.querySelectorAll("[data-pal]").forEach(b=>b.setAttribute("aria-checked",String(b.dataset.pal===p)));
+  try{localStorage.setItem("stockbook.palette",p);}catch(e){}
+  const m=document.querySelector('meta[name="theme-color"]'); if(m)m.content=getComputedStyle(document.documentElement).getPropertyValue("--bg").trim();
+  if(!$("chartCard").hidden)renderChart(lots());
+}
+document.querySelectorAll("[data-pal]").forEach(b=>b.addEventListener("click",()=>setPalette(b.dataset.pal)));
+$("qaDiv").addEventListener("click",()=>$("divSec").scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"}));
+
+/* ---------- cumulative P/L chart ---------- */
+let chartRange="ALL", chartPts=[];
+document.querySelectorAll("[data-range]").forEach(b=>b.addEventListener("click",()=>{chartRange=b.dataset.range;document.querySelectorAll("[data-range]").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));renderChart(lots());}));
+function smoothPath(P){
+  // monotone cubic (Fritsch–Carlson): smooth without overshooting the data
+  const n=P.length; if(n<2)return"";
+  const dx=[],dy=[],m=[],t=[];
+  for(let i=0;i<n-1;i++){dx[i]=P[i+1].x-P[i].x;dy[i]=P[i+1].y-P[i].y;m[i]=dx[i]?dy[i]/dx[i]:0;}
+  t[0]=m[0];t[n-1]=m[n-2];
+  for(let i=1;i<n-1;i++)t[i]=m[i-1]*m[i]<=0?0:(m[i-1]+m[i])/2;
+  for(let i=0;i<n-1;i++){if(!m[i]){t[i]=t[i+1]=0;continue;}const a=t[i]/m[i],b=t[i+1]/m[i],s=a*a+b*b;if(s>9){const k=3/Math.sqrt(s);t[i]=k*a*m[i];t[i+1]=k*b*m[i];}}
+  let d=`M${P[0].x},${P[0].y}`;
+  for(let i=0;i<n-1;i++){const h=dx[i]/3;d+=` C${P[i].x+h},${P[i].y+t[i]*h} ${P[i+1].x-h},${P[i+1].y-t[i+1]*h} ${P[i+1].x},${P[i+1].y}`;}
+  return d;
+}
+function renderChart(L){
+  const box=$("chartBox");
+  const S=L.filter(sold).sort((a,b)=>a.sellDate<b.sellDate?-1:a.sellDate>b.sellDate?1:0);
+  const pts=[]; let cum=0;
+  for(const l of S){cum+=plT(l);const last=pts[pts.length-1];if(last&&last.d===l.sellDate)last.v=cum;else pts.push({d:l.sellDate,v:cum});}
+  if(pts.length<1){box.innerHTML=`<div class="chart-empty">ใส่ราคาขายรายการแรกแล้วกราฟกำไรจะขึ้นที่นี่</div>`;chartPts=[];return;}
+  const days={"1M":30,"3M":91,"6M":182,"1Y":365}[chartRange];
+  let P=[{d:pts[0].d,v:0},...pts];
+  if(days){
+    const start=new Date(Date.now()-days*864e5).toISOString().slice(0,10);
+    const before=P.filter(p=>p.d<start);
+    P=[{d:start,v:before.length?before[before.length-1].v:0},...P.filter(p=>p.d>=start)];
+  }
+  const now=today(); if(P[P.length-1].d<now)P.push({d:now,v:P[P.length-1].v});
+  if(P.length<2)P.unshift({d:P[0].d,v:P[0].v});
+  const W=1000,H=210,padT=24,padB=26;
+  const t0=Date.parse(P[0].d),t1=Math.max(Date.parse(P[P.length-1].d),t0+864e5);
+  let lo=Math.min(0,...P.map(p=>p.v)),hi=Math.max(0,...P.map(p=>p.v)); if(hi-lo<1){hi+=1;lo-=1;}
+  const X=d=>14+(Date.parse(d)-t0)/(t1-t0)*(W-40), Y=v=>padT+(hi-v)/(hi-lo)*(H-padT-padB);
+  const XY=P.map(p=>({x:+X(p.d).toFixed(1),y:+Y(p.v).toFixed(1),d:p.d,v:p.v}));
+  const line=smoothPath(XY), area=line+` L${W},${H} L0,${H} Z`, zy=Y(0).toFixed(1);
+  const id="g"+Math.random().toString(36).slice(2,7);
+  chartPts=XY.map(p=>({...p,px:p.x/W,py:p.y/H}));
+  const end=chartPts[chartPts.length-1];
+  box.innerHTML=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true">
+    <defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--accent-2)" stop-opacity=".55"/><stop offset="1" stop-color="var(--accent)" stop-opacity="0"/></linearGradient>
+    <linearGradient id="${id}l" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="var(--accent)"/><stop offset="1" stop-color="var(--accent-2)"/></linearGradient></defs>
+    <line x1="0" x2="${W}" y1="${zy}" y2="${zy}" stroke="var(--line-strong)" stroke-dasharray="4 6" vector-effect="non-scaling-stroke"/>
+    <path d="${area}" fill="url(#${id})"/>
+    <path d="${line}" fill="none" stroke="url(#${id}l)" stroke-width="3" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+  </svg><span class="chart-end" style="left:${end.px*100}%;top:${end.py*100}%"></span><span class="chart-vline" hidden></span><span class="chart-dot" hidden></span><div class="chart-tip" hidden></div>`;
+  box.setAttribute("aria-label",`กำไรสะสม ${baht(end.v,true)}`);
+}
+function chartHover(e){
+  if(!chartPts.length)return;
+  const box=$("chartBox"), r=box.getBoundingClientRect(), fx=(e.clientX-r.left)/r.width;
+  let best=chartPts[0]; for(const p of chartPts)if(Math.abs(p.px-fx)<Math.abs(best.px-fx))best=p;
+  const dot=box.querySelector(".chart-dot"), tip=box.querySelector(".chart-tip"), vl=box.querySelector(".chart-vline"); if(!dot)return;
+  dot.hidden=tip.hidden=vl.hidden=false;
+  dot.style.left=vl.style.left=best.px*100+"%"; dot.style.top=best.py*100+"%";
+  tip.innerHTML=`${fdate(best.d)}<b class="num tone-${tone(best.v)}">${baht(best.v,true)}</b>`;
+  const tw=tip.offsetWidth, left=Math.min(Math.max(best.px*r.width,tw/2+8),r.width-tw/2-8);
+  tip.style.left=left+"px"; tip.style.top=(best.py*r.height>r.height/2?8:r.height-tip.offsetHeight-8)+"px";
+}
+function chartLeave(){const box=$("chartBox");box.querySelectorAll(".chart-dot,.chart-tip,.chart-vline").forEach(x=>x.hidden=true);}
+$("chartBox").addEventListener("pointermove",chartHover);
+$("chartBox").addEventListener("pointerdown",chartHover);
+$("chartBox").addEventListener("pointerleave",chartLeave);
+setPalette(document.documentElement.dataset.palette||"indigo");
 
 /* ---------- sheets ---------- */
 let lastFocus=null;
