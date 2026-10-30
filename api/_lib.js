@@ -78,4 +78,18 @@ function send(res, code, obj) {
   res.status(code).json(obj);
 }
 
-module.exports = { configured, kv, pipeline, normUser, hashPin, safeEqual, newSession, tokenOf, userOf, body, send };
+// Google Sign-In: the browser sends Google's ID token; we ask Google to check it and
+// accept it only if it was issued for this site's client ID.
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || "412163359994-ejpuph3kjaj86mvc11th1t2g24rhb64f.apps.googleusercontent.com";
+async function verifyGoogle(credential) {
+  if (!/^[\w-]+\.[\w-]+\.[\w-]+$/.test(String(credential || ""))) return null;
+  const r = await fetch("https://oauth2.googleapis.com/tokeninfo?id_token=" + encodeURIComponent(credential));
+  if (!r.ok) return null;
+  const t = await r.json();
+  const issOk = t.iss === "accounts.google.com" || t.iss === "https://accounts.google.com";
+  if (!issOk || t.aud !== GOOGLE_CLIENT_ID || !t.sub || +t.exp * 1000 < Date.now()) return null;
+  if (t.email_verified !== true && t.email_verified !== "true") return null;
+  return { sub: String(t.sub), email: t.email || "", name: t.name || "", picture: t.picture || "" };
+}
+
+module.exports = { verifyGoogle, GOOGLE_CLIENT_ID, configured, kv, pipeline, normUser, hashPin, safeEqual, newSession, tokenOf, userOf, body, send };

@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>นโยบายความเป็นส่วนตัว · nd-stockbook</title>
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/logo-32.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;600;700&display=swap">
+<style>
+:root{--bg:#06071A;--card:#0E1130;--line:rgba(170,180,255,.10);--fg:#EEF0FF;--muted:#A3A8CF;--accent:#7B6CFF;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:"IBM Plex Sans Thai","Noto Sans Thai",system-ui,sans-serif;line-height:1.75;font-size:15.5px}
+main{max-width:720px;margin:0 auto;padding:40px max(18px,env(safe-area-inset-left,0px)) 80px}
+.top{display:flex;align-items:center;gap:12px;margin-bottom:28px;color:var(--fg);text-decoration:none}
+.top img{width:40px;height:40px}
+.top b{font-size:17px}
+h1{font-size:28px;margin:0 0 6px;line-height:1.3}
+.date{color:var(--muted);font-size:13.5px;margin:0 0 28px}
+h2{font-size:18px;margin:28px 0 8px}
+p,li{color:#D6D9F5}
+ul{padding-left:22px}
+a{color:#B3A9FF}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px 22px;margin-top:28px}
+</style>
+</head>
+<body>
+<main>
+  <a class="top" href="/"><img src="/icons/logo-96.png" alt=""><b>nd-stockbook</b></a>
+  <h1>นโยบายความเป็นส่วนตัว</h1>
+  <p class="date">ปรับปรุงล่าสุด 30 ตุลาคม 2026</p>
+
+  <p>nd-stockbook (สมุดพอร์ตหุ้น) เป็นเว็บส่วนตัวสำหรับจดราคาซื้อขายหุ้นและปันผล หน้านี้อธิบายว่าเว็บเก็บข้อมูลอะไร ใช้ทำอะไร และลบอย่างไร</p>
+
+  <h2>ข้อมูลที่เราได้จาก Google</h2>
+  <p>เมื่อคุณเข้าสู่ระบบด้วย Google เราได้รับเฉพาะ รหัสบัญชี Google ชื่อ อีเมล และรูปโปรไฟล์ เราใช้รหัสบัญชีเพื่อแยกข้อมูลของแต่ละคน และใช้ชื่อกับอีเมลแสดงในหน้าเว็บว่าคุณเข้าสู่ระบบอยู่ เราไม่ขอสิทธิ์เข้าถึง Gmail, Drive, รายชื่อติดต่อ หรือบริการอื่นของ Google</p>
+
+  <h2>ข้อมูลที่คุณจดเอง</h2>
+  <ul>
+    <li>รายการซื้อขายหุ้น: ชื่อหุ้น ราคา จำนวน เรตแลกเงิน วันที่ และโน้ต</li>
+    <li>รายการปันผลที่คุณบันทึก</li>
+  </ul>
+  <p>ข้อมูลเหล่านี้เก็บในฐานข้อมูลของเว็บ (Upstash บน Vercel) และสำเนาในเบราว์เซอร์ของคุณ เพื่อให้เปิดจากหลายเครื่องแล้วเห็นข้อมูลเดียวกัน</p>
+
+  <h2>ภาพที่อัปโหลด</h2>
+  <p>ภาพคำสั่งซื้อขายที่ใช้กับปุ่ม "อ่านจากภาพ" ถูกอ่านในเบราว์เซอร์ของคุณเอง ภาพไม่ถูกส่งหรือเก็บไว้ที่เซิร์ฟเวอร์</p>
+
+  <h2>ข้อมูลราคาและปันผล</h2>
+  <p>เว็บส่งเฉพาะชื่อหุ้นไปขอประวัติปันผลจาก Yahoo Finance ไม่ส่งข้อมูลส่วนตัวหรือจำนวนหุ้นของคุณ</p>
+
+  <h2>การแบ่งปันข้อมูล</h2>
+  <p>เราไม่ขาย ไม่แชร์ และไม่ใช้ข้อมูลของคุณเพื่อโฆษณา ข้อมูลถูกเก็บกับผู้ให้บริการที่จำเป็นต่อการทำงานของเว็บเท่านั้น คือ Vercel (โฮสต์เว็บ) และ Upstash (ฐานข้อมูล)</p>
+
+  <h2>การลบข้อมูล</h2>
+  <p>คุณลบรายการแต่ละรายการได้เองในเว็บ ถ้าต้องการลบบัญชีและข้อมูลทั้งหมด ส่งอีเมลมาที่อีเมลด้านล่าง เราจะลบให้ภายใน 30 วัน</p>
+
+  <div class="card">
+    <b>ติดต่อ</b>
+    <p style="margin:6px 0 0">nd.nudee@gmail.com</p>
+  </div>
+</main>
+</body>
+</html>

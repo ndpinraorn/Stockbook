@@ -11,6 +11,7 @@
 <link rel="icon" type="image/png" sizes="64x64" href="/icons/logo-64.png">
 <link rel="apple-touch-icon" href="/icons/mark-180.png">
 <link rel="manifest" href="/manifest.webmanifest">
+<script src="https://accounts.google.com/gsi/client" async></script>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="nd-stockbook">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -212,6 +213,10 @@ th[aria-sort] .sortb{color:var(--fg)}
 .seg button{border:0;background:transparent;padding:9px;border-radius:999px;font-size:14px;font-weight:600;color:var(--muted);transition:background .25s,color .25s}
 .seg button[aria-selected="true"]{background:var(--accent);color:var(--accent-fg)}
 .pin{letter-spacing:.3em}
+.gbtn-wrap{min-height:44px;display:flex;justify-content:center;align-items:center}
+.gload{font-size:14px;color:var(--muted)}
+.gfine{margin:0;font-size:12.5px;color:var(--faint);text-align:center;line-height:1.6}
+.gfine a{color:var(--muted)}
 .gate-note{padding:12px 14px;border-radius:var(--r-sm);background:var(--hold-soft);color:var(--fg);font-size:13.5px;line-height:1.55}
 .gate-note b{display:block}
 .linkbtn{border:0;background:none;padding:4px 0;color:var(--muted);font-size:13.5px;text-decoration:underline;text-underline-offset:3px;align-self:center}
@@ -320,12 +325,18 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.8)}
         <button type="button" id="exportBtn">ดาวน์โหลดไฟล์สำรอง<small>เก็บไว้ย้ายไปเครื่องอื่นหรือกันข้อมูลหาย</small></button>
         <button type="button" id="importBtn">นำเข้าไฟล์สำรอง<small>แทนที่ข้อมูลทั้งหมดด้วยไฟล์</small></button>
         <hr>
+        <button type="button" id="linkBtn" hidden>ย้ายข้อมูลจากบัญชี PIN เดิม<small>ใช้ชื่อผู้ใช้กับ PIN ที่เคยตั้งไว้</small></button>
+        <hr>
         <button type="button" id="logoutBtn" hidden>ออกจากระบบ<small id="logoutSub"></small></button>
-        <button type="button" id="loginBtn" hidden>เข้าสู่ระบบ<small>เห็นข้อมูลเดียวกันทุกเครื่อง</small></button>
       </div>
     </details>
   </header>
 
+
+  <div class="banner" id="linkBanner" hidden>
+    <div><b>เคยใช้บัญชีชื่อผู้ใช้ + PIN ไหม?</b> ย้ายข้อมูลเดิมเข้าบัญชี Google นี้ได้ครั้งเดียว</div>
+    <div style="display:flex;gap:6px"><button type="button" class="btn" id="linkSkip">ไม่มี</button><button type="button" class="btn primary" id="linkOpen">ย้ายข้อมูล</button></div>
+  </div>
 
   <div class="banner" id="moveBanner" hidden>
     <div><b>พบข้อมูลเดิมในเครื่องนี้</b> <span id="moveText"></span></div>
@@ -500,24 +511,27 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.8)}
     <div class="gate-brand">
       <img class="logo" src="/icons/logo-192.png" alt="" width="44" height="44">
       <h1>nd-stockbook</h1>
-      <p>เข้าสู่ระบบแล้วเปิดจากมือถือหรือคอมเครื่องไหนก็เห็นข้อมูลชุดเดียวกัน</p>
+      <p>เข้าสู่ระบบด้วย Google แล้วเปิดจากมือถือหรือคอมเครื่องไหนก็เห็นข้อมูลชุดเดียวกัน</p>
     </div>
-    <form class="gate-form" id="gateForm" novalidate>
-      <div class="seg" role="tablist" aria-label="เลือก">
-        <button type="button" role="tab" id="tabLogin" aria-selected="true">เข้าสู่ระบบ</button>
-        <button type="button" role="tab" id="tabReg" aria-selected="false">สร้างบัญชี</button>
-      </div>
-      <label class="field"><span class="fl">ชื่อผู้ใช้</span><input id="g-user" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="24" placeholder="เช่น nd"></label>
-      <label class="field"><span class="fl">PIN (ตัวเลข 4–8 หลัก)</span><input id="g-pin" class="num pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="8" autocomplete="current-password"></label>
-      <label class="field" id="g-pin2-wrap" hidden><span class="fl">ยืนยัน PIN</span><input id="g-pin2" class="num pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="8" autocomplete="new-password"></label>
+    <div class="gate-form" id="gateForm">
+      <div class="gbtn-wrap" id="gBtn" aria-live="polite"><span class="gload">กำลังโหลดปุ่ม Google…</span></div>
       <p class="err" id="g-err" role="alert" hidden></p>
-      <button type="submit" class="submit" id="g-submit">เข้าสู่ระบบ</button>
       <div class="gate-note" id="g-note" hidden></div>
-    </form>
-    <button type="button" class="linkbtn" id="g-local">ใช้แบบไม่ล็อกอิน เก็บข้อมูลไว้ในเครื่องนี้</button>
+      <p class="gfine">เราใช้แค่ชื่อและอีเมลจาก Google เพื่อแยกข้อมูลของแต่ละคน <a href="/privacy">นโยบายความเป็นส่วนตัว</a></p>
+    </div>
   </div>
 </div>
 
+<div class="backdrop" id="bdLink" hidden>
+  <form class="sheet" id="fLink" role="dialog" aria-modal="true" aria-labelledby="linkTitle" novalidate>
+    <div class="sheet-head"><h2 id="linkTitle">ย้ายข้อมูลจากบัญชี PIN เดิม</h2><button type="button" class="x" data-close aria-label="ปิด">×</button></div>
+    <div class="ctx">ใส่ชื่อผู้ใช้กับ PIN ที่เคยใช้ รายการซื้อขายและปันผลทั้งหมดจะย้ายมาอยู่ในบัญชี Google นี้ หลังจากนั้นบัญชี PIN จะใช้เข้าสู่ระบบไม่ได้แล้ว</div>
+    <label class="field"><span class="fl">ชื่อผู้ใช้เดิม</span><input id="l-user" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="24"></label>
+    <label class="field"><span class="fl">PIN เดิม</span><input id="l-pin" class="num pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="8" autocomplete="current-password"></label>
+    <p class="err" id="l-err" role="alert" hidden></p>
+    <button type="submit" class="submit" id="l-submit">ย้ายข้อมูล</button>
+  </form>
+</div>
 <div class="toast" id="toast" role="status" hidden></div>
 <input type="file" id="scanFile" accept="image/png,image/jpeg,image/webp" hidden>
 <input type="file" id="importFile" accept="application/json,.json" hidden>
@@ -791,7 +805,7 @@ $("chartBox").addEventListener("pointerleave",chartLeave);
 
 /* ---------- sheets ---------- */
 let lastFocus=null;
-const SHEETS=["bdBuy","bdSell","bdDiv"];
+const SHEETS=["bdBuy","bdSell","bdDiv","bdLink"];
 function openSheet(id){lastFocus=document.activeElement;SHEETS.forEach(s=>$(s).hidden=s!==id);}
 function closeAll(){const was=SHEETS.some(s=>!$(s).hidden);SHEETS.forEach(s=>$(s).hidden=true);if(scanCtl)scanCtl.cancelled=true;if(was&&lastFocus&&document.contains(lastFocus))try{lastFocus.focus({preventScroll:true});}catch(e){}}
 document.querySelectorAll("[data-close]").forEach(b=>b.addEventListener("click",closeAll));
@@ -1164,7 +1178,7 @@ function setSync(state,text){$("syncState").dataset.s=state;$("syncText").textCo
 function syncLabel(){
   if(auth.mode!=="cloud"){setSync("local","บันทึกไว้ในเบราว์เซอร์นี้");return;}
   if(flushing||queue.length)setSync(offline?"off":"busy",offline?"ยังไม่ได้ซิงก์ จะลองใหม่เมื่อออนไลน์":"กำลังบันทึก…");
-  else setSync("ok",`บัญชี ${auth.user} · ซิงก์แล้ว`);
+  else setSync("ok",`${auth.email||"บัญชี Google"} · ซิงก์แล้ว`);
 }
 async function api(path,opt){
   const r=await fetch(path,{...opt,headers:{"Content-Type":"application/json",...(auth.token?{Authorization:"Bearer "+auth.token}:{}),...((opt&&opt.headers)||{})}});
@@ -1199,10 +1213,10 @@ async function pull(){
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"){if(queue.length)flush();else pull();}});
 
 function applyAccountUI(){
-  const cloud=auth.mode==="cloud";
-  $("menuLabel").textContent=cloud?auth.user:"เมนู";
-  $("logoutBtn").hidden=!cloud; $("loginBtn").hidden=cloud;
-  $("logoutSub").textContent=cloud?`บัญชี ${auth.user}`:"";
+  const cloud=auth.mode==="cloud", label=auth.name||auth.email||"เมนู";
+  $("menuLabel").textContent=cloud?(auth.name?auth.name.split(" ")[0]:label):"เมนู";
+  $("logoutBtn").hidden=!cloud; $("linkBtn").hidden=!cloud;
+  $("logoutSub").textContent=cloud?(auth.email||""):"";
   syncLabel();
 }
 function enterLocal(){
@@ -1210,14 +1224,16 @@ function enterLocal(){
   data=loadData(KEY); $("gate").hidden=true; $("moveBanner").hidden=true;
   applyAccountUI(); render(); fetchDividends(false);
 }
-async function enterCloud(user,token,fresh){
-  auth={mode:"cloud",user,token}; lsSet(MODE_KEY,"cloud"); lsSet(SESSION_KEY,JSON.stringify({user,token}));
+async function enterCloud(user,token,fresh,prof){
+  prof=prof||{};
+  auth={mode:"cloud",user,token,email:prof.email||"",name:prof.name||""}; lsSet(MODE_KEY,"cloud"); lsSet(SESSION_KEY,JSON.stringify({user,token,email:auth.email,name:auth.name}));
   try{queue=JSON.parse(lsGet("stockbook.queue."+user)||"[]")||[];}catch(e){queue=[];}
   data=loadData(); $("gate").hidden=true; applyAccountUI(); render();
   if(queue.length)await flush();
   await pull();
   fetchDividends(false);
   offerMove(fresh);
+  $("linkBanner").hidden=!(data.lots.length===0&&!lsGet("stockbook.linkasked."+auth.user));
 }
 /* data kept in this browser before signing in can be moved into the account once */
 function offerMove(){
@@ -1225,7 +1241,7 @@ function offerMove(){
   const done=lsGet("stockbook.moved."+auth.user);
   $("moveBanner").hidden=!(auth.mode==="cloud"&&local.lots.length&&!done);
   render();
-  if(!$("moveBanner").hidden)$("moveText").textContent=`${local.lots.length} รายการ${local.divs.length?` และปันผล ${local.divs.length} รายการ`:""} ย้ายเข้าบัญชี ${auth.user} ไหม`;
+  if(!$("moveBanner").hidden)$("moveText").textContent=`${local.lots.length} รายการ${local.divs.length?` และปันผล ${local.divs.length} รายการ`:""} ย้ายเข้าบัญชีนี้ไหม`;
 }
 $("moveSkip").addEventListener("click",()=>{lsSet("stockbook.moved."+auth.user,"skip");$("moveBanner").hidden=true;});
 $("moveGo").addEventListener("click",()=>{
@@ -1238,61 +1254,81 @@ $("moveGo").addEventListener("click",()=>{
 });
 function expired(){lsSet(SESSION_KEY,null);showGate("เซสชันหมดอายุ กรุณาเข้าสู่ระบบอีกครั้ง");}
 
-/* sign-in screen */
-let gateMode="login";
-function setGateMode(m){
-  gateMode=m;
-  $("tabLogin").setAttribute("aria-selected",String(m==="login"));$("tabReg").setAttribute("aria-selected",String(m==="register"));
-  $("g-pin2-wrap").hidden=m!=="register"; $("g-submit").textContent=m==="login"?"เข้าสู่ระบบ":"สร้างบัญชี";
-  $("g-pin").autocomplete=m==="login"?"current-password":"new-password"; $("g-err").hidden=true;
-}
-$("tabLogin").addEventListener("click",()=>setGateMode("login"));
-$("tabReg").addEventListener("click",()=>setGateMode("register"));
-function showGate(msg){
-  closeAll(); $("gate").hidden=false; $("g-pin").value=""; $("g-pin2").value="";
-  $("g-err").textContent=msg||""; $("g-err").hidden=!msg; $("g-submit").disabled=false;
-  setTimeout(()=>$($("g-user").value?"g-pin":"g-user").focus(),60);
-}
-function noStorage(){
-  const n=$("g-note"); n.hidden=false;
-  n.innerHTML="<b>ยังไม่ได้เชื่อมฐานข้อมูล</b>ในหน้าโปรเจกต์บน Vercel ไปที่แท็บ Storage แล้วเชื่อม Upstash (Redis) แบบฟรี จากนั้นกด Redeploy ระหว่างนี้ใช้แบบไม่ล็อกอินไปก่อนได้";
-}
-const GATE_ERR={bad_username:"ชื่อผู้ใช้ต้องยาว 2–24 ตัว ใช้ตัวอักษร ตัวเลข _ . - ได้",bad_pin:"PIN ต้องเป็นตัวเลข 4–8 หลัก",username_taken:"ชื่อนี้มีคนใช้แล้ว ลองชื่ออื่น",locked:"ใส่ PIN ผิดหลายครั้ง บัญชีถูกล็อก 15 นาที",server_error:"ระบบขัดข้อง ลองใหม่อีกครั้ง"};
-$("gateForm").addEventListener("submit",async e=>{
-  e.preventDefault();
-  const err=m=>{$("g-err").textContent=m;$("g-err").hidden=false;};
-  const user=$("g-user").value.trim(), pin=$("g-pin").value.trim();
-  if(user.length<2){$("g-user").focus();return err(GATE_ERR.bad_username);}
-  if(!/^\d{4,8}$/.test(pin)){$("g-pin").focus();return err(GATE_ERR.bad_pin);}
-  if(gateMode==="register"&&$("g-pin2").value.trim()!==pin){$("g-pin2").focus();return err("PIN สองช่องไม่ตรงกัน");}
-  $("g-submit").disabled=true;
+/* sign-in screen: Google only */
+const GOOGLE_CLIENT_ID="412163359994-ejpuph3kjaj86mvc11th1t2g24rhb64f.apps.googleusercontent.com";
+let gReady=false;
+function gErr(m){$("g-err").textContent=m||"";$("g-err").hidden=!m;}
+function noStorage(){const n=$("g-note");n.hidden=false;n.innerHTML="<b>ยังไม่ได้เชื่อมฐานข้อมูล</b>ติดต่อผู้ดูแลเว็บ";}
+async function onGoogle(resp){
+  gErr("");
+  $("gBtn").innerHTML='<span class="gload">กำลังเข้าสู่ระบบ…</span>';
   try{
-    const r=await api("/api/auth",{method:"POST",body:JSON.stringify({action:gateMode,username:user,pin})});
-    if(r.status===503){noStorage();throw {msg:"ยังเข้าสู่ระบบไม่ได้ เพราะยังไม่ได้เชื่อมฐานข้อมูล"};}
-    if(!r.ok){
-      const c=r.data.error;
-      throw {msg:c==="wrong_login"?(r.data.left>0?`ชื่อผู้ใช้หรือ PIN ไม่ถูกต้อง (ลองได้อีก ${r.data.left} ครั้ง)`:"ชื่อผู้ใช้หรือ PIN ไม่ถูกต้อง"):(GATE_ERR[c]||"เข้าสู่ระบบไม่สำเร็จ ลองใหม่อีกครั้ง")};
-    }
-    await enterCloud(r.data.username,r.data.token,gateMode==="register");
-    toast(gateMode==="register"?`สร้างบัญชี ${r.data.username} แล้ว`:`ยินดีต้อนรับ ${r.data.username}`);
-  }catch(x){$("g-submit").disabled=false;err(x&&x.msg?x.msg:"เชื่อมต่อไม่ได้ ตรวจอินเทอร์เน็ตแล้วลองใหม่");}
-});
-$("g-local").addEventListener("click",enterLocal);
-$("loginBtn").addEventListener("click",()=>{$("menu").open=false;setGateMode("login");showGate();});
+    const r=await api("/api/auth",{method:"POST",body:JSON.stringify({action:"google",credential:resp.credential})});
+    if(r.status===503){noStorage();throw 0;}
+    if(!r.ok)throw 0;
+    await enterCloud(r.data.user,r.data.token,false,{email:r.data.email,name:r.data.name});
+    toast(`ยินดีต้อนรับ ${r.data.name||r.data.email||""}`);
+  }catch(e){gErr("เข้าสู่ระบบไม่สำเร็จ ลองใหม่อีกครั้ง");}
+  renderGoogleBtn();
+}
+function renderGoogleBtn(){
+  const box=$("gBtn");
+  if(!(window.google&&google.accounts&&google.accounts.id)){box.innerHTML='<span class="gload">กำลังโหลดปุ่ม Google…</span>';return false;}
+  if(!gReady){google.accounts.id.initialize({client_id:GOOGLE_CLIENT_ID,callback:onGoogle,auto_select:true,cancel_on_tap_outside:true,use_fedcm_for_prompt:true});gReady=true;}
+  box.innerHTML="";
+  const w=Math.min(360,Math.max(220,box.clientWidth||320));
+  google.accounts.id.renderButton(box,{theme:"filled_black",size:"large",shape:"pill",text:"signin_with",locale:"th",width:w,logo_alignment:"center"});
+  return true;
+}
+function whenGoogle(cb,tries){tries=tries||0;if(window.google&&google.accounts&&google.accounts.id)return cb();if(tries>80){gErr("โหลดปุ่ม Google ไม่สำเร็จ ตรวจอินเทอร์เน็ตแล้วรีเฟรชหน้า");return;}setTimeout(()=>whenGoogle(cb,tries+1),150);}
+function showGate(msg){
+  closeAll(); $("gate").hidden=false; gErr(msg||"");
+  whenGoogle(()=>{renderGoogleBtn();});
+}
+function expired(){lsSet(SESSION_KEY,null);showGate("เซสชันหมดอายุ กรุณาเข้าสู่ระบบอีกครั้ง");}
 $("logoutBtn").addEventListener("click",async()=>{
   $("menu").open=false;
   if(queue.length&&!confirm("ยังมีรายการที่ยังไม่ได้ซิงก์ ออกจากระบบตอนนี้รายการเหล่านั้นจะหายไป ออกเลยไหม?"))return;
   try{await api("/api/auth",{method:"POST",body:JSON.stringify({action:"logout"})});}catch(e){}
+  try{google.accounts.id.disableAutoSelect();}catch(e){}
   const u=auth.user;
   lsSet(SESSION_KEY,null); lsSet("stockbook.cache."+u,null); lsSet("stockbook.queue."+u,null); lsSet(MODE_KEY,null);
   auth={mode:"local",user:null,token:null}; queue=[]; data=shape(null); render();
-  $("g-user").value=u||""; setGateMode("login"); showGate(); toast("ออกจากระบบแล้ว");
+  $("linkBanner").hidden=true; $("moveBanner").hidden=true;
+  showGate(); toast("ออกจากระบบแล้ว");
+});
+
+/* move data from an old username + PIN account */
+function openLink(){$("menu").open=false;$("l-user").value="";$("l-pin").value="";$("l-err").hidden=true;$("l-submit").disabled=false;openSheet("bdLink");setTimeout(()=>$("l-user").focus(),60);}
+$("linkBtn").addEventListener("click",openLink);
+$("linkOpen").addEventListener("click",openLink);
+$("linkSkip").addEventListener("click",()=>{lsSet("stockbook.linkasked."+auth.user,"1");$("linkBanner").hidden=true;});
+$("fLink").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const err=m=>{$("l-err").textContent=m;$("l-err").hidden=false;};
+  const u=$("l-user").value.trim(), pin=$("l-pin").value.trim();
+  if(u.length<2){$("l-user").focus();return err("ใส่ชื่อผู้ใช้เดิม");}
+  if(!/^\d{4,8}$/.test(pin)){$("l-pin").focus();return err("PIN เป็นตัวเลข 4–8 หลัก");}
+  $("l-submit").disabled=true;
+  try{
+    if(queue.length)await flush();
+    const r=await api("/api/auth",{method:"POST",body:JSON.stringify({action:"link",username:u,pin})});
+    if(r.status===401&&r.data.error==="not_signed_in"){closeAll();expired();return;}
+    if(!r.ok){
+      const c=r.data.error;
+      throw {msg:c==="wrong_login"?(r.data.left>0?`ชื่อผู้ใช้หรือ PIN ไม่ถูกต้อง (ลองได้อีก ${r.data.left} ครั้ง)`:"ชื่อผู้ใช้หรือ PIN ไม่ถูกต้อง"):c==="locked"?"ใส่ PIN ผิดหลายครั้ง บัญชีถูกล็อก 15 นาที":c==="already_linked"?"บัญชีนี้ย้ายเข้าบัญชี Google อื่นไปแล้ว":"ย้ายข้อมูลไม่สำเร็จ ลองใหม่อีกครั้ง"};
+    }
+    lsSet("stockbook.linkasked."+auth.user,"1"); $("linkBanner").hidden=true;
+    closeAll(); await pull(); scheduleDividends();
+    toast(`ย้ายแล้ว ${r.data.lots} รายการ${r.data.divs?` และปันผล ${r.data.divs} รายการ`:""}`);
+  }catch(x){$("l-submit").disabled=false;err(x&&x.msg?x.msg:"เชื่อมต่อไม่ได้ ตรวจอินเทอร์เน็ตแล้วลองใหม่");}
 });
 
 function boot(){
   let sess=null; try{sess=JSON.parse(lsGet(SESSION_KEY)||"null");}catch(e){}
-  if(sess&&sess.user&&sess.token){enterCloud(sess.user,sess.token,false);return;}
-  if(lsGet(MODE_KEY)==="local"){enterLocal();return;}
+  // only Google sessions are kept; older username+PIN sessions sign in again with Google
+  if(sess&&sess.user&&sess.token&&String(sess.user).startsWith("g:")){enterCloud(sess.user,sess.token,false,{email:sess.email,name:sess.name});return;}
+  lsSet(SESSION_KEY,null); lsSet(MODE_KEY,null);
   applyAccountUI(); render(); showGate();
 }
 boot();
