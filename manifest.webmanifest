@@ -1,0 +1,12 @@
+{
+  "name": "nd-stockbook สมุดพอร์ตหุ้น",
+  "short_name": "nd-stockbook",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#06071A",
+  "theme_color": "#06071A",
+  "icons": [
+    { "src": "/icons/mark-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icons/mark-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
