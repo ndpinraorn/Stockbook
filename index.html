@@ -201,23 +201,30 @@ th[aria-sort] .sortb{color:var(--fg)}
 @keyframes filled{0%,45%{border-color:var(--gain);box-shadow:0 0 0 3px color-mix(in srgb,var(--gain) 28%,transparent)}}
 
 /* sign-in gate */
-.gate{position:fixed;inset:0;z-index:50;overflow:auto;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:calc(24px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(24px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
-.gate .bg{position:absolute}
-.gate-card{position:relative;z-index:1;width:100%;max-width:400px;display:flex;flex-direction:column;gap:20px;animation:fadeup .5s cubic-bezier(.2,.8,.2,1)}
-.gate-brand{display:flex;flex-direction:column;align-items:flex-start;gap:12px}
-.gate-brand .logo{width:88px;height:88px}
-.gate-brand h1{margin:0;font-size:30px;font-weight:700;line-height:1.2;letter-spacing:-.01em}
-.gate-brand p{margin:0;color:var(--muted);font-size:14.5px}
-.gate-form{display:flex;flex-direction:column;gap:14px;padding:22px;border-radius:var(--r);background:linear-gradient(160deg,var(--card-2),var(--card));border:1px solid var(--line);box-shadow:var(--shadow)}
+.gate{position:fixed;inset:0;z-index:50;overflow:auto;background:#070920 url(/img/login-bg.webp) center/cover no-repeat;display:flex;align-items:center;justify-content:center;padding:calc(24px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(24px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.gate .bg{position:absolute;inset:0;pointer-events:none;background:radial-gradient(60% 55% at 50% 50%,rgba(6,7,26,.55),rgba(6,7,26,0) 70%)}
+.gate .bg::before,.gate .bg::after{display:none}
+@media (max-width:640px){.gate{background-image:url(/img/login-bg-900.webp);background-position:86% center}}
+.gate-card{position:relative;z-index:1;width:100%;max-width:420px;display:flex;flex-direction:column;align-items:center;gap:28px;padding:40px 32px 28px;border-radius:28px;background:linear-gradient(160deg,rgba(40,46,110,.42),rgba(14,17,48,.38));border:1px solid rgba(190,198,255,.16);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 30px 80px -30px rgba(0,0,0,.75);-webkit-backdrop-filter:blur(22px) saturate(140%);backdrop-filter:blur(22px) saturate(140%);animation:fadeup .5s cubic-bezier(.2,.8,.2,1)}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.gate-card{background:rgba(16,19,52,.92)}}
+.gate-brand{display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px}
+.gate-brand .logo{width:72px;height:72px}
+.gate-brand h1{margin:0;font-size:28px;font-weight:700;line-height:1.2;letter-spacing:-.01em}
+.gate-brand p{margin:0;color:#B9BDE3;font-size:14.5px;line-height:1.65;max-width:300px}
+.gate-form{width:100%;display:flex;flex-direction:column;gap:16px}
+.gate-cta{width:100%;display:flex;flex-direction:column;gap:10px}
+.gate-cta .eyebrow{margin:0;text-align:center;font-size:13px;font-weight:600;color:#D9DCFA}
+.gate-div{width:100%;height:1px;background:rgba(190,198,255,.12)}
+@media (max-width:420px){.gate-card{padding:32px 20px 24px;border-radius:24px;gap:24px}}
 .seg{display:grid;grid-template-columns:1fr 1fr;padding:4px;border-radius:999px;background:var(--card)}
 .seg button{border:0;background:transparent;padding:9px;border-radius:999px;font-size:14px;font-weight:600;color:var(--muted);transition:background .25s,color .25s}
 .seg button[aria-selected="true"]{background:var(--accent);color:var(--accent-fg)}
 .pin{letter-spacing:.3em}
-.gbtn-wrap{min-height:44px;display:flex;justify-content:center;align-items:center}
+.gbtn-wrap{min-height:48px;display:flex;justify-content:center;align-items:center;border-radius:999px}
 .gbtn-wrap iframe{color-scheme:light}
-.gload{font-size:14px;color:var(--muted)}
-.gfine{margin:0;font-size:12.5px;color:var(--faint);text-align:center;line-height:1.6}
-.gfine a{color:var(--muted)}
+.gload{width:100%;height:48px;display:flex;align-items:center;justify-content:center;border-radius:999px;background:#fff;color:#3c4043;font-size:14px;font-weight:600;opacity:.9}
+.gfine{margin:0;font-size:12.5px;color:#9298C6;text-align:center;line-height:1.6}
+.gfine a{color:#C9C4FF;text-underline-offset:3px}
 .gate-note{padding:12px 14px;border-radius:var(--r-sm);background:var(--hold-soft);color:var(--fg);font-size:13.5px;line-height:1.55}
 .gate-note b{display:block}
 .linkbtn{border:0;background:none;padding:4px 0;color:var(--muted);font-size:13.5px;text-decoration:underline;text-underline-offset:3px;align-self:center}
@@ -512,13 +519,17 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.8)}
     <div class="gate-brand">
       <img class="logo" src="/icons/logo-192.png" alt="" width="44" height="44">
       <h1>nd-stockbook</h1>
-      <p>เข้าสู่ระบบด้วย Google แล้วเปิดจากมือถือหรือคอมเครื่องไหนก็เห็นข้อมูลชุดเดียวกัน</p>
+      <p>จดซื้อขายหุ้นไทยและอเมริกา<br>ดูกำไรขาดทุนเป็น<span style="white-space:nowrap">เงินบาท</span></p>
     </div>
     <div class="gate-form" id="gateForm">
-      <div class="gbtn-wrap" id="gBtn" aria-live="polite"><span class="gload">กำลังโหลดปุ่ม Google…</span></div>
+      <div class="gate-cta">
+        <p class="eyebrow">เข้าสู่ระบบเพื่อเริ่มจดพอร์ต</p>
+        <div class="gbtn-wrap" id="gBtn" aria-live="polite"><span class="gload">กำลังโหลดปุ่ม Google…</span></div>
+      </div>
       <p class="err" id="g-err" role="alert" hidden></p>
       <div class="gate-note" id="g-note" hidden></div>
-      <p class="gfine">เราใช้แค่ชื่อและอีเมลจาก Google เพื่อแยกข้อมูลของแต่ละคน <a href="/privacy">นโยบายความเป็นส่วนตัว</a></p>
+      <div class="gate-div"></div>
+      <p class="gfine">เราใช้แค่ชื่อและอีเมลจาก Google เพื่อแยกข้อมูลของแต่ละคน<br><a href="/privacy">นโยบายความเป็นส่วนตัว</a></p>
     </div>
   </div>
 </div>
@@ -1278,8 +1289,8 @@ function renderGoogleBtn(){
   if(!gReady){google.accounts.id.initialize({client_id:GOOGLE_CLIENT_ID,callback:onGoogle,auto_select:true,cancel_on_tap_outside:true,use_fedcm_for_prompt:true});gReady=true;}
   if(box.dataset.r==="1")return true;
   box.dataset.r="1"; box.innerHTML="";
-  const w=Math.min(360,Math.max(220,box.clientWidth||320));
-  google.accounts.id.renderButton(box,{theme:"filled_black",size:"large",shape:"pill",text:"signin_with",locale:"th",width:w,logo_alignment:"center"});
+  const w=Math.min(400,Math.max(220,Math.floor(box.clientWidth)||320));
+  google.accounts.id.renderButton(box,{theme:"outline",size:"large",shape:"pill",text:"continue_with",locale:"th",width:w,logo_alignment:"center"});
   return true;
 }
 function whenGoogle(cb,tries){tries=tries||0;if(window.google&&google.accounts&&google.accounts.id)return cb();if(tries>80){gErr("โหลดปุ่ม Google ไม่สำเร็จ ตรวจอินเทอร์เน็ตแล้วรีเฟรชหน้า");return;}setTimeout(()=>whenGoogle(cb,tries+1),150);}
