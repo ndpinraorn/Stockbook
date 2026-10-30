@@ -55,7 +55,17 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
 .logo{width:44px;height:44px;flex:none;display:block;object-fit:contain}
 .top h1{font-size:17px;font-weight:700;margin:0;line-height:1.25}
 .top .sub{font-size:12px;color:var(--muted)}
-.menu{margin-left:auto;position:relative}
+.menu{position:relative}
+.lang{display:inline-flex;padding:3px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid var(--line);flex:none}
+.lang button{border:0;background:transparent;color:var(--muted);font-size:12.5px;font-weight:600;padding:6px 11px;border-radius:999px;line-height:1;transition:background .2s,color .2s}
+.lang button[aria-pressed="true"]{background:rgba(255,255,255,.12);color:var(--fg)}
+.lang button:hover{color:var(--fg)}
+.top .lang{margin-left:auto}
+.top>div:not(.lang){min-width:0}
+.top h1{white-space:nowrap}
+.top .sub{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:520px){#menuLabel{display:none}.menu>summary{padding:9px 11px}.lang button{padding:6px 9px}.top .logo{width:36px;height:36px}}
+.gate>.lang{position:absolute;z-index:2;top:calc(16px + env(safe-area-inset-top,0px));right:max(16px,env(safe-area-inset-right,0px));background:rgba(14,17,48,.5);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
 .menu>summary{list-style:none;display:flex;align-items:center;gap:8px;background:var(--card-2);border:1px solid var(--line);padding:9px 16px;border-radius:999px;font-size:13.5px;font-weight:600;color:var(--fg);cursor:pointer;transition:background .2s}
 .menu>summary:hover{background:var(--card-3)}
 .menu>summary::-webkit-details-marker{display:none}
@@ -122,7 +132,8 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
 
 /* first-run */
 .welcome{display:flex;flex-direction:column;align-items:flex-start;gap:10px;padding:36px 28px;animation:fadeup .5s cubic-bezier(.2,.8,.2,1)}
-.welcome .w-ic{width:72px;height:72px;display:block;object-fit:contain}
+.welcome .w-ic{width:52px;height:52px;display:grid;place-items:center;border-radius:16px;background:color-mix(in srgb,var(--accent) 16%,transparent);border:1px solid color-mix(in srgb,var(--accent) 30%,transparent);color:#C9C2FF;margin-bottom:4px}
+.welcome .w-ic svg{width:26px;height:26px}
 .welcome h2{margin:8px 0 0;font-size:26px;font-weight:700}
 .welcome p{margin:0;color:var(--muted);max-width:46ch}
 .welcome .w-acts{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
@@ -213,7 +224,6 @@ th[aria-sort] .sortb{color:var(--fg)}
 .gate-brand p{margin:0;color:#B9BDE3;font-size:14.5px;line-height:1.65;max-width:300px}
 .gate-form{width:100%;display:flex;flex-direction:column;gap:16px}
 .gate-cta{width:100%;display:flex;flex-direction:column;gap:10px}
-.gate-cta .eyebrow{margin:0;text-align:center;font-size:13px;font-weight:600;color:#D9DCFA}
 .gate-div{width:100%;height:1px;background:rgba(190,198,255,.12)}
 @media (max-width:420px){.gate-card{padding:32px 20px 24px;border-radius:24px;gap:24px}}
 .seg{display:grid;grid-template-columns:1fr 1fr;padding:4px;border-radius:999px;background:var(--card)}
@@ -327,6 +337,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.8)}
       <h1>nd-stockbook</h1>
       <div class="sub"><span class="sync" id="syncState" data-s="local"><i></i><span id="syncText">บันทึกไว้ในเบราว์เซอร์นี้</span></span></div>
     </div>
+    <div class="lang" role="group" aria-label="ภาษา / Language"><button type="button" data-lang="th" aria-pressed="true">ไทย</button><button type="button" data-lang="en" aria-pressed="false">EN</button></div>
     <details class="menu" id="menu">
       <summary><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span id="menuLabel">เมนู</span></summary>
       <div class="menu-pop">
@@ -352,7 +363,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.8)}
   </div>
 
   <section class="welcome card" id="welcome" hidden>
-    <img class="w-ic" src="/icons/logo-192.png" alt="" width="72" height="72">
+    <span class="w-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13.4 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7.4"/><path d="M2 6h4"/><path d="M2 10h4"/><path d="M2 14h4"/><path d="M2 18h4"/><path d="M21.378 5.626a1 1 0 1 0-3.004-3.004l-5.01 5.012a2 2 0 0 0-.506.854l-.837 2.87a.5.5 0 0 0 .62.62l2.87-.837a2 2 0 0 0 .854-.506z"/></svg></span>
     <h2>เริ่มจดรายการแรก</h2>
     <p>จดตอนซื้อ แล้วใส่ราคาขายทีหลัง ระบบจะคำนวณกำไร ROI และปันผลเป็นเงินบาทให้</p>
     <div class="w-acts"><button type="button" class="submit" data-open-add>จดการซื้อ</button><button type="button" class="pillbtn" data-scan-pick="main">อ่านจากภาพ Dime</button></div>
@@ -515,15 +526,15 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.8)}
 
 <div class="gate" id="gate" hidden>
   <div class="bg" aria-hidden="true"></div>
+  <div class="lang" role="group" aria-label="ภาษา / Language"><button type="button" data-lang="th" aria-pressed="true">ไทย</button><button type="button" data-lang="en" aria-pressed="false">EN</button></div>
   <div class="gate-card">
     <div class="gate-brand">
       <img class="logo" src="/icons/logo-192.png" alt="" width="44" height="44">
-      <h1>nd-stockbook</h1>
-      <p>จดซื้อขายหุ้นไทยและอเมริกา<br>ดูกำไรขาดทุนเป็น<span style="white-space:nowrap">เงินบาท</span></p>
+      <h1>เข้าสู่ระบบ</h1>
+      <p>จดซื้อขายหุ้นไทยและอเมริกา<br>ดูกำไรขาดทุนเป็นเงินบาท</p>
     </div>
     <div class="gate-form" id="gateForm">
       <div class="gate-cta">
-        <p class="eyebrow">เข้าสู่ระบบเพื่อเริ่มจดพอร์ต</p>
         <div class="gbtn-wrap" id="gBtn" aria-live="polite"><span class="gload">กำลังโหลดปุ่ม Google…</span></div>
       </div>
       <p class="err" id="g-err" role="alert" hidden></p>
@@ -552,8 +563,68 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.8)}
 <script>
 (function(){
 "use strict";
+/* ---------- language ---------- */
+const LANG_KEY="stockbook.lang";
+let LANG=(()=>{try{const v=localStorage.getItem(LANG_KEY);if(v==="th"||v==="en")return v;}catch(e){}return /^th\b/i.test(navigator.language||"th")?"th":"en";})();
+const tt=(th,en)=>LANG==="en"?en:th;
+const EN={
+"บันทึกไว้ในเบราว์เซอร์นี้":"Saved in this browser","เมนู":"Menu",
+"ดาวน์โหลดไฟล์สำรอง":"Download backup","เก็บไว้ย้ายไปเครื่องอื่นหรือกันข้อมูลหาย":"Keep a copy to move devices or avoid losing data",
+"นำเข้าไฟล์สำรอง":"Import backup","แทนที่ข้อมูลทั้งหมดด้วยไฟล์":"Replaces all data with the file",
+"ย้ายข้อมูลจากบัญชี PIN เดิม":"Move data from old PIN account","ใช้ชื่อผู้ใช้กับ PIN ที่เคยตั้งไว้":"Use the username and PIN you set before",
+"ออกจากระบบ":"Sign out",
+"เคยใช้บัญชีชื่อผู้ใช้ + PIN ไหม?":"Used a username + PIN account before?","ย้ายข้อมูลเดิมเข้าบัญชี Google นี้ได้ครั้งเดียว":"You can move its data into this Google account once",
+"ไม่มี":"No","ย้ายข้อมูล":"Move data","พบข้อมูลเดิมในเครื่องนี้":"Found earlier data on this device","ไม่ต้อง":"Skip","ย้ายเข้าบัญชี":"Move to account",
+"เริ่มจดรายการแรก":"Log your first trade","จดตอนซื้อ แล้วใส่ราคาขายทีหลัง ระบบจะคำนวณกำไร ROI และปันผลเป็นเงินบาทให้":"Log it when you buy and add the sell price later. Profit, ROI and dividends are worked out in Thai baht.",
+"จดการซื้อ":"Log a buy","อ่านจากภาพ Dime":"Read a Dime screenshot",
+"สรุปผล":"Summary","กำไร / ขาดทุนที่ขายแล้ว":"Realized profit / loss","ปันผลที่ได้ (หลังหักภาษี)":"Dividends received (after tax)",
+"หุ้นที่ยังถือ":"Holdings","ต้นทุนหุ้นที่ยังถือ":"Cost of current holdings","จดซื้อ":"Buy","อ่านภาพ":"Scan","ปันผล":"Dividends",
+"กำไรสะสมจากที่ขาย":"Cumulative realized profit","ใช้เงินซื้อไป":"Cost basis","ช่วงเวลา":"Time range",
+"กรองรายการ":"Filter","ทั้งหมด":"All","ยังถืออยู่":"Holding","ขายแล้ว":"Sold","จดปันผล":"Log dividend",
+"ยอด":"","ประมาณ":"Estimated","คิดจากปันผลต่อหุ้น × หุ้นที่ถือก่อนวัน XD หักภาษี 15% สำหรับหุ้นสหรัฐ และ 10% สำหรับหุ้นไทย แปลงเป็นบาทด้วยเรตล่าสุดที่คุณใช้ กด “ใส่ยอดจริง” เพื่อแทนด้วยตัวเลขจาก Dime":"amounts use dividend per share × shares held before the XD date, minus 15% tax for US stocks and 10% for Thai stocks, converted to baht at your latest rate. Tap “Enter actual” to replace one with the figure from Dime.",
+"ปิด":"Close","ชื่อหุ้น":"Symbol","เช่น PTT หรือ AAPL":"e.g. PTT or AAPL","หุ้นที่เคยจด":"Recent symbols","ตลาด":"Market",
+"หุ้นไทย":"Thai stock","บาท":"THB","หุ้นสหรัฐ":"US stock","ตลาดอื่น":"Other","เลือกสกุลเงิน":"Pick currency","สกุลเงินอื่น":"Other currencies",
+"HKD ฮ่องกง":"HKD Hong Kong","CNY จีน":"CNY China","JPY ญี่ปุ่น":"JPY Japan","EUR ยุโรป":"EUR Europe","GBP อังกฤษ":"GBP UK","SGD สิงคโปร์":"SGD Singapore",
+"ราคาที่ซื้อ ต่อหุ้น":"Buy price per share","ราคาเป็นสกุลเงินต่างประเทศ":"Price in foreign currency","ราคาเป็นบาท":"Price in baht",
+"เรต Dime ตอนซื้อ":"Dime rate at buy","บาท / 1":"THB / 1","กรอกช่องดอลลาร์หรือบาทช่องไหนก็ได้ อีกช่องจะคำนวณให้":"Fill in either box; the other is calculated for you",
+"จำนวนหุ้น":"Shares","วันที่ซื้อ":"Buy date","โน้ต (ไม่ใส่ก็ได้)":"Note (optional)","เงินที่ใช้ซื้อ":"Total cost","บันทึก":"Save",
+"ยกเลิกการขาย":"Undo sell","ลบรายการนี้":"Delete this entry",
+"จดการขาย":"Log a sell","ราคาที่ขาย ต่อหุ้น":"Sell price per share","ราคาขายเป็นสกุลเงินต่างประเทศ":"Sell price in foreign currency","ราคาขายเป็นบาท":"Sell price in baht",
+"เรต Dime ตอนขาย":"Dime rate at sell","จำนวนที่ขาย":"Shares sold","วันที่ขาย":"Sell date","ขายทั้งหมด":"Sell all","ขายครึ่งหนึ่ง":"Sell half",
+"ขายไม่หมด ส่วนที่เหลือจะแยกเป็นอีกรายการที่ยังถืออยู่":"Partial sell: the rest stays as a separate holding","กำไร":"Profit","บันทึกการขาย":"Save sell",
+"หุ้นที่ได้ปันผล":"Stock that paid","หุ้นในสมุด":"Your symbols","ยอดที่ได้รับจริง (หลังหักภาษี)":"Amount received (after tax)",
+"ยอดเป็นสกุลเงินต่างประเทศ":"Amount in foreign currency","ยอดเป็นบาท":"Amount in baht","เรตแลกเงิน":"Exchange rate","วันที่ได้รับ":"Date received","บันทึกปันผล":"Save dividend",
+"เข้าสู่ระบบ":"Sign in","จดซื้อขายหุ้นไทยและอเมริกา":"Track your Thai and US stock trades","ดูกำไรขาดทุนเป็นเงินบาท":"with profit and loss in Thai baht",
+"กำลังโหลดปุ่ม Google…":"Loading Google button…","เราใช้แค่ชื่อและอีเมลจาก Google เพื่อแยกข้อมูลของแต่ละคน":"We only use your Google name and email to keep each person's data separate",
+"นโยบายความเป็นส่วนตัว":"Privacy policy",
+"ใส่ชื่อผู้ใช้กับ PIN ที่เคยใช้ รายการซื้อขายและปันผลทั้งหมดจะย้ายมาอยู่ในบัญชี Google นี้ หลังจากนั้นบัญชี PIN จะใช้เข้าสู่ระบบไม่ได้แล้ว":"Enter your old username and PIN. All trades and dividends move into this Google account, and the PIN account can no longer sign in.",
+"ชื่อผู้ใช้เดิม":"Old username","PIN เดิม":"Old PIN"
+};
+const I18N_ATTRS=["aria-label","placeholder","alt","title"];
+function i18nStatic(root){
+  const w=document.createTreeWalker(root||document.body,NodeFilter.SHOW_TEXT,{acceptNode:n=>/^(SCRIPT|STYLE)$/.test(n.parentNode.nodeName)?NodeFilter.FILTER_REJECT:NodeFilter.FILTER_ACCEPT});
+  let n; while((n=w.nextNode())){
+    const cur=n.nodeValue;
+    if(n.__th!==undefined&&cur!==n.__th&&cur!==n.__en){delete n.__th;delete n.__en;}
+    const orig=n.__th!==undefined?n.__th:cur, key=orig.trim();
+    if(!key||EN[key]===undefined)continue;
+    const en=orig.replace(key,EN[key]);
+    n.__th=orig; n.__en=en; n.nodeValue=LANG==="en"?en:orig;
+  }
+  (root||document.body).querySelectorAll("[aria-label],[placeholder],[alt],[title]").forEach(el=>{
+    for(const a of I18N_ATTRS){
+      if(!el.hasAttribute(a))continue;
+      const ds="th"+a.replace(/-./g,m=>m[1].toUpperCase()).replace(/^./,c=>c.toUpperCase());
+      const orig=el.dataset[ds]!==undefined?el.dataset[ds]:el.getAttribute(a);
+      if(EN[orig]===undefined)continue;
+      el.dataset[ds]=orig; el.setAttribute(a,LANG==="en"?EN[orig]:orig);
+    }
+  });
+}
 const SYM={THB:"฿",USD:"$",HKD:"HK$",CNY:"¥",JPY:"¥",EUR:"€",GBP:"£",SGD:"S$"};
-const MKT={THB:"หุ้นไทย",USD:"หุ้นสหรัฐ",HKD:"หุ้นฮ่องกง",CNY:"หุ้นจีน",JPY:"หุ้นญี่ปุ่น",EUR:"หุ้นยุโรป",GBP:"หุ้นอังกฤษ",SGD:"หุ้นสิงคโปร์"};
+const MKT_TH={THB:"หุ้นไทย",USD:"หุ้นสหรัฐ",HKD:"หุ้นฮ่องกง",CNY:"หุ้นจีน",JPY:"หุ้นญี่ปุ่น",EUR:"หุ้นยุโรป",GBP:"หุ้นอังกฤษ",SGD:"หุ้นสิงคโปร์"};
+const MKT_EN={THB:"Thai stocks",USD:"US stocks",HKD:"Hong Kong stocks",CNY:"China stocks",JPY:"Japan stocks",EUR:"Europe stocks",GBP:"UK stocks",SGD:"Singapore stocks"};
+const MKT=new Proxy({},{get:(_,k)=>(LANG==="en"?MKT_EN:MKT_TH)[k]});
 const DEFAULT_RATES={USD:33.77,HKD:4.34,CNY:4.74,JPY:0.22,EUR:39.2,GBP:45.0,SGD:26.0};
 const KEY="stockbook.v1", DIVCACHE="stockbook.divcache.v1";
 
@@ -568,7 +639,7 @@ const cacheKey=()=>auth.mode==="cloud"?"stockbook.cache."+auth.user:KEY;
 function shape(d){return d&&Array.isArray(d.lots)?{lots:d.lots,divs:Array.isArray(d.divs)?d.divs:[],rates:{...DEFAULT_RATES,...(d.rates||{})}}:{lots:[],divs:[],rates:{...DEFAULT_RATES}};}
 function loadData(k){try{return shape(JSON.parse(lsGet(k||cacheKey())||"null"));}catch(e){return shape(null);}}
 let data=shape(null);
-function save(){try{localStorage.setItem(cacheKey(),JSON.stringify(data));}catch(e){if(auth.mode==="local"){toast("บันทึกไม่สำเร็จ เบราว์เซอร์อาจปิดการเก็บข้อมูลไว้");return false;}}return true;}
+function save(){try{localStorage.setItem(cacheKey(),JSON.stringify(data));}catch(e){if(auth.mode==="local"){toast(tt("บันทึกไม่สำเร็จ เบราว์เซอร์อาจปิดการเก็บข้อมูลไว้","Couldn't save. This browser may be blocking storage"));return false;}}return true;}
 window.addEventListener("storage",e=>{if(auth.mode==="local"&&e.key===KEY){data=loadData();render();}});
 
 let st={f:"all",sort:{key:"default",dir:-1}};
@@ -585,7 +656,7 @@ const tone=v=>v>0.004?"gain":v<-0.004?"loss":"zero";
 const num=s=>{const n=parseFloat(String(s??"").replace(/,/g,"").trim());return isFinite(n)?n:NaN;};
 const inStr=v=>isFinite(v)?String(Math.round(v*10000)/10000):"";
 const in2=v=>isFinite(v)?String(Math.round(v*100)/100):"";
-const fdate=d=>{if(!d)return"";try{return new Date(d+"T00:00:00").toLocaleDateString("th-TH",{day:"numeric",month:"short",year:"2-digit"});}catch(e){return d;}};
+const fdate=d=>{if(!d)return"";try{return new Date(d+"T00:00:00").toLocaleDateString(LANG==="en"?"en-GB":"th-TH",{day:"numeric",month:"short",year:"2-digit"});}catch(e){return d;}};
 const today=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");};
 const newId=p=>(p||"l")+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 const sold=l=>l.sellPrice!=null&&l.sellPrice>0;
@@ -599,7 +670,7 @@ const sellT=l=>l.sellPrice*fxS(l);
 const costT=l=>buyT(l)*l.qty;
 const plT=l=>sold(l)?(sellT(l)-buyT(l))*l.qty:0;
 const pctT=l=>sold(l)&&buyT(l)>0?(sellT(l)-buyT(l))/buyT(l):0;
-const mktChip=c=>`<span class="chip ${c==="THB"?"th":""}">${c==="THB"?"ไทย":esc(c)}</span>`;
+const mktChip=c=>`<span class="chip ${c==="THB"?"th":""}">${c==="THB"?tt("ไทย","TH"):esc(c)}</span>`;
 const ccyOrder=(a,b)=>a==="THB"?-1:b==="THB"?1:a.localeCompare(b);
 const ccyOfSym=s=>{const l=lots().find(x=>x.symbol===s);return l?l.ccy:null;};
 function rememberRate(c,fx){if(c==="THB"||!(fx>0))return;data.rates[c]=fx;save();}
@@ -674,7 +745,7 @@ function render(){
   const rp=$("roiPill"); rp.hidden=!S.length; rp.className="pill num "+tone(roi); rp.textContent="ROI "+pct(roi);
   const by={}; for(const l of S)by[l.ccy]=(by[l.ccy]||0)+plT(l);
   const ks=Object.keys(by).sort(ccyOrder);
-  $("split").innerHTML=!S.length?"ยังไม่มีรายการที่ขาย ใส่ราคาขายแล้วกำไรจะขึ้นที่นี่":ks.length>1?ks.map(k=>`<span>${MKT[k]||k}<b class="num tone-${tone(by[k])}">${baht(by[k],true)}</b></span>`).join(""):"";
+  $("split").innerHTML=!S.length?tt("ยังไม่มีรายการที่ขาย ใส่ราคาขายแล้วกำไรจะขึ้นที่นี่","No sells yet. Add a sell price and your profit shows here"):ks.length>1?ks.map(k=>`<span>${MKT[k]||k}<b class="num tone-${tone(by[k])}">${baht(by[k],true)}</b></span>`).join(""):"";
   $("split").hidden=!!S.length&&ks.length<=1;
   $("fSoldCost").textContent=baht(sc); $("fHoldCost").textContent=baht(hc);
   if(!empty)renderChart(L);
@@ -682,11 +753,11 @@ function render(){
 
   const base=st.f==="hold"?H:st.f==="sold"?S:L;
   $("list").hidden=empty;
-  $("list").innerHTML=base.length?tableHTML(sortLots(base),sample):`<div class="tblwrap"><div class="empty">${st.f==="hold"?"ไม่มีหุ้นที่ยังถืออยู่":st.f==="sold"?"ยังไม่มีรายการที่ขาย":"ยังไม่มีรายการ กด “จดการซื้อ” เพื่อเริ่ม"}</div></div>`;
+  $("list").innerHTML=base.length?tableHTML(sortLots(base),sample):`<div class="tblwrap"><div class="empty">${st.f==="hold"?tt("ไม่มีหุ้นที่ยังถืออยู่","No current holdings"):st.f==="sold"?tt("ยังไม่มีรายการที่ขาย","No sells yet"):tt("ยังไม่มีรายการ กด “จดการซื้อ” เพื่อเริ่ม","No entries yet. Tap “Log a buy” to start")}</div></div>`;
 
   const rows=divRows(L);
   $("fDiv").textContent=baht(rows.reduce((a,r)=>a+(r.thb||0),0));
-  $("divStatus").textContent=divState==="loading"?"กำลังดึงข้อมูลปันผล…":divState==="error"?"ดึงข้อมูลปันผลไม่สำเร็จ":"";
+  $("divStatus").textContent=divState==="loading"?tt("กำลังดึงข้อมูลปันผล…","Loading dividends…"):divState==="error"?tt("ดึงข้อมูลปันผลไม่สำเร็จ","Couldn't load dividends"):"";
   $("divAdd").hidden=sample;
   $("divList").innerHTML=divHTML(rows,sample);
 }
@@ -704,40 +775,40 @@ const orig=(p,c)=>c==="THB"?"":money(p,c)+" · ";
 function tableHTML(list,sample){
   const S=list.filter(sold);
   const tpl=S.reduce((a,l)=>a+plT(l),0), tc=S.reduce((a,l)=>a+costT(l),0), tr=tc>0?tpl/tc:0;
-  const foot=S.length?`<tr><td>รวมที่ขายแล้ว</td><td class="m-only"></td><td class="d-only"></td><td class="d-only"></td><td class="r num d-only">${baht(tc)}</td><td class="r plc"><div class="main num tone-${tone(tpl)}">${baht(tpl,true)}</div><div class="sub num tone-${tone(tpl)}">${pct(tr)}</div></td><td class="d-only"></td></tr>`:"";
+  const foot=S.length?`<tr><td>${tt("รวมที่ขายแล้ว","Total sold")}</td><td class="m-only"></td><td class="d-only"></td><td class="d-only"></td><td class="r num d-only">${baht(tc)}</td><td class="r plc"><div class="main num tone-${tone(tpl)}">${baht(tpl,true)}</div><div class="sub num tone-${tone(tpl)}">${pct(tr)}</div></td><td class="d-only"></td></tr>`:"";
   return `<div class="tblwrap"><table class="tbl"><thead><tr>
-    ${th("หุ้น","symbol")}<th class="m-only">ราคา (บาท)</th>${th("ซื้อ","buy","r d-only")}${th("ขาย","sell","r d-only")}${th("ต้นทุน","cost","r d-only")}${th("กำไร / ขาดทุน","pl","r plc")}<th class="d-only"><span style="position:absolute;left:-9999px">จัดการ</span></th>
+    ${th(tt("หุ้น","Stock"),"symbol")}<th class="m-only">${tt("ราคา (บาท)","Price (THB)")}</th>${th(tt("ซื้อ","Buy"),"buy","r d-only")}${th(tt("ขาย","Sell"),"sell","r d-only")}${th(tt("ต้นทุน","Cost"),"cost","r d-only")}${th(tt("กำไร / ขาดทุน","Profit / loss"),"pl","r plc")}<th class="d-only"><span style="position:absolute;left:-9999px">${tt("จัดการ","Actions")}</span></th>
   </tr></thead><tbody>`+list.map(l=>{
     const s=sold(l), p=plT(l);
     return `<tr${sample?"":` class="tap" data-edit="${esc(l.id)}"`}>
-      <td><div class="sym-wrap">${avatar(l.symbol)}<div><div class="symn">${esc(l.symbol)}${mktChip(l.ccy)}</div><div class="sub num">${nfq.format(l.qty)} หุ้น${l.note?" · "+esc(l.note):""}</div></div></div></td>
-      <td class="m-only"><div class="mline num"><span class="mk">ซื้อ</span>${baht(buyT(l))}</div><div class="mline num"><span class="mk">ขาย</span>${s?baht(sellT(l)):`<span class="chip hold">ยังถือ</span>`}</div></td>
+      <td><div class="sym-wrap">${avatar(l.symbol)}<div><div class="symn">${esc(l.symbol)}${mktChip(l.ccy)}</div><div class="sub num">${nfq.format(l.qty)} ${tt("หุ้น","shares")}${l.note?" · "+esc(l.note):""}</div></div></div></td>
+      <td class="m-only"><div class="mline num"><span class="mk">${tt("ซื้อ","Buy")}</span>${baht(buyT(l))}</div><div class="mline num"><span class="mk">${tt("ขาย","Sell")}</span>${s?baht(sellT(l)):`<span class="chip hold">${tt("ยังถือ","Holding")}</span>`}</div></td>
       <td class="r d-only"><div class="main num">${baht(buyT(l))}</div><div class="sub num">${orig(l.buyPrice,l.ccy)}${fdate(l.buyDate)}</div></td>
-      <td class="r d-only">${s?`<div class="main num">${baht(sellT(l))}</div><div class="sub num">${orig(l.sellPrice,l.ccy)}${fdate(l.sellDate)}</div>`:`<span class="chip hold">ยังถือ</span>`}</td>
+      <td class="r d-only">${s?`<div class="main num">${baht(sellT(l))}</div><div class="sub num">${orig(l.sellPrice,l.ccy)}${fdate(l.sellDate)}</div>`:`<span class="chip hold">${tt("ยังถือ","Holding")}</span>`}</td>
       <td class="r num d-only">${baht(costT(l))}</td>
-      <td class="r plc">${s?`<span class="plpill num ${tone(p)}">${baht(p,true)}</span><div class="sub num tone-${tone(p)}" style="margin-top:4px">${pct(pctT(l))}</div>`:(sample?`<span class="muted">—</span>`:`<button type="button" class="mini primary m-btn" data-sell="${esc(l.id)}">ขาย</button><span class="muted d-only">—</span>`)}</td>
-      <td class="d-only">${sample?"":`<div class="acts">${s?"":`<button type="button" class="mini primary" data-sell="${esc(l.id)}">ขาย</button>`}<button type="button" class="mini" data-edit="${esc(l.id)}">แก้ไข</button></div>`}</td></tr>`;
+      <td class="r plc">${s?`<span class="plpill num ${tone(p)}">${baht(p,true)}</span><div class="sub num tone-${tone(p)}" style="margin-top:4px">${pct(pctT(l))}</div>`:(sample?`<span class="muted">—</span>`:`<button type="button" class="mini primary m-btn" data-sell="${esc(l.id)}">${tt("ขาย","Sell")}</button><span class="muted d-only">—</span>`)}</td>
+      <td class="d-only">${sample?"":`<div class="acts">${s?"":`<button type="button" class="mini primary" data-sell="${esc(l.id)}">${tt("ขาย","Sell")}</button>`}<button type="button" class="mini" data-edit="${esc(l.id)}">${tt("แก้ไข","Edit")}</button></div>`}</td></tr>`;
   }).join("")+`</tbody>${foot?`<tfoot>${foot}</tfoot>`:""}</table></div>`;
 }
 function divHTML(rows,sample){
   if(!rows.length){
-    const msg=divState==="loading"?"กำลังดึงข้อมูลปันผล…":divState==="error"?"ดึงข้อมูลปันผลไม่สำเร็จ ลองรีเฟรชหน้า หรือกด “จดปันผล” เพื่อใส่เอง":"ยังไม่มีปันผลสำหรับหุ้นในสมุด";
+    const msg=divState==="loading"?tt("กำลังดึงข้อมูลปันผล…","Loading dividends…"):divState==="error"?tt("ดึงข้อมูลปันผลไม่สำเร็จ ลองรีเฟรชหน้า หรือกด “จดปันผล” เพื่อใส่เอง","Couldn't load dividends. Refresh, or tap “Log dividend” to add one yourself"):tt("ยังไม่มีปันผลสำหรับหุ้นในสมุด","No dividends yet for your stocks");
     return `<div class="tblwrap"><div class="empty">${msg}</div></div>`;
   }
   const tot=rows.reduce((a,r)=>a+(r.thb||0),0);
-  return `<div class="tblwrap"><table class="tbl"><thead><tr><th>หุ้น</th><th class="d-only">วันที่</th><th class="r d-only">ต่อหุ้น</th><th class="r d-only">หุ้นที่ถือ</th><th class="r plc">ได้รับ (บาท)</th><th class="d-only"><span style="position:absolute;left:-9999px">จัดการ</span></th></tr></thead><tbody>`+
+  return `<div class="tblwrap"><table class="tbl"><thead><tr><th>${tt("หุ้น","Stock")}</th><th class="d-only">${tt("วันที่","Date")}</th><th class="r d-only">${tt("ต่อหุ้น","Per share")}</th><th class="r d-only">${tt("หุ้นที่ถือ","Shares held")}</th><th class="r plc">${tt("ได้รับ (บาท)","Received (THB)")}</th><th class="d-only"><span style="position:absolute;left:-9999px">${tt("จัดการ","Actions")}</span></th></tr></thead><tbody>`+
   rows.map(r=>{
     const isAct=r.type==="act";
-    const dateLine=isAct?`ได้รับ ${fdate(r.date)}${r.exDate?` · XD ${fdate(r.exDate)}`:""}`:`XD ${fdate(r.exDate)}`;
+    const dateLine=isAct?`${tt("ได้รับ","Paid")} ${fdate(r.date)}${r.exDate?` · XD ${fdate(r.exDate)}`:""}`:`XD ${fdate(r.exDate)}`;
     const attr=sample?"":isAct?` class="tap" data-div-edit="${esc(r.id)}"`:` class="tap" data-div-real="${esc(r.symbol)}|${r.exDate}|${r.native}|${r.ccy}"`;
     return `<tr${attr}>
       <td><div class="sym-wrap">${avatar(r.symbol)}<div><div class="symn">${esc(r.symbol)}${mktChip(r.ccy||"THB")}</div><div class="sub num msub">${dateLine}</div></div></div></td>
       <td class="d-only num">${dateLine}</td>
       <td class="r num d-only">${r.per!=null?(r.ccy==="THB"?"฿":(SYM[r.ccy]||""))+nf4.format(r.per):`<span class="muted">—</span>`}</td>
       <td class="r num d-only">${r.shares!=null?nfq.format(r.shares):`<span class="muted">—</span>`}</td>
-      <td class="r plc"><div class="main num">${baht(r.thb||0)}</div><div class="sub"><span class="chip ${isAct?"act":"est"}">${isAct?"จริง":"ประมาณ"}</span></div></td>
-      <td class="d-only">${sample?"":`<div class="acts">${isAct?`<button type="button" class="mini" data-div-edit="${esc(r.id)}">แก้ไข</button>`:`<button type="button" class="mini" data-div-real="${esc(r.symbol)}|${r.exDate}|${r.native}|${r.ccy}">ใส่ยอดจริง</button>`}</div>`}</td></tr>`;
-  }).join("")+`</tbody><tfoot><tr><td>รวมปันผล</td><td class="d-only"></td><td class="d-only"></td><td class="d-only"></td><td class="r plc num">${baht(tot)}</td><td class="d-only"></td></tr></tfoot></table></div>`;
+      <td class="r plc"><div class="main num">${baht(r.thb||0)}</div><div class="sub"><span class="chip ${isAct?"act":"est"}">${isAct?tt("จริง","Actual"):tt("ประมาณ","Estimated")}</span></div></td>
+      <td class="d-only">${sample?"":`<div class="acts">${isAct?`<button type="button" class="mini" data-div-edit="${esc(r.id)}">${tt("แก้ไข","Edit")}</button>`:`<button type="button" class="mini" data-div-real="${esc(r.symbol)}|${r.exDate}|${r.native}|${r.ccy}">${tt("ใส่ยอดจริง","Enter actual")}</button>`}</div>`}</td></tr>`;
+  }).join("")+`</tbody><tfoot><tr><td>${tt("รวมปันผล","Total dividends")}</td><td class="d-only"></td><td class="d-only"></td><td class="d-only"></td><td class="r plc num">${baht(tot)}</td><td class="d-only"></td></tr></tfoot></table></div>`;
 }
 
 /* ---------- avatar ---------- */
@@ -771,7 +842,7 @@ function renderChart(L){
   const S=L.filter(sold).sort((a,b)=>a.sellDate<b.sellDate?-1:a.sellDate>b.sellDate?1:0);
   const pts=[]; let cum=0;
   for(const l of S){cum+=plT(l);const last=pts[pts.length-1];if(last&&last.d===l.sellDate)last.v=cum;else pts.push({d:l.sellDate,v:cum});}
-  if(pts.length<1){box.innerHTML=`<div class="chart-empty">ใส่ราคาขายรายการแรกแล้วกราฟกำไรจะขึ้นที่นี่</div>`;chartPts=[];return;}
+  if(pts.length<1){box.innerHTML=`<div class="chart-empty">${tt("ใส่ราคาขายรายการแรกแล้วกราฟกำไรจะขึ้นที่นี่","Add your first sell price and the profit chart shows here")}</div>`;chartPts=[];return;}
   const days={"1M":30,"3M":91,"6M":182,"1Y":365}[chartRange];
   let P=[{d:pts[0].d,v:0},...pts];
   if(days){
@@ -797,7 +868,7 @@ function renderChart(L){
     <path d="${area}" fill="url(#${id})"/>
     <path d="${line}" fill="none" stroke="url(#${id}l)" stroke-width="3" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
   </svg><span class="chart-end" style="left:${end.px*100}%;top:${end.py*100}%"></span><span class="chart-vline" hidden></span><span class="chart-dot" hidden></span><div class="chart-tip" hidden></div>`;
-  box.setAttribute("aria-label",`กำไรสะสม ${baht(end.v,true)}`);
+  box.setAttribute("aria-label",`${tt("กำไรสะสม","Cumulative profit")} ${baht(end.v,true)}`);
 }
 function chartHover(e){
   if(!chartPts.length)return;
@@ -846,7 +917,7 @@ function setCcy(c,keepFx){
   $("b-mkt").querySelectorAll("[data-mkt]").forEach(b=>b.setAttribute("aria-checked",String(b.dataset.mkt===mk)));
   $("b-other").hidden=mk!=="other";
   $("b-other").querySelectorAll("[data-ccy]").forEach(b=>b.setAttribute("aria-checked",String(b.dataset.ccy===c)));
-  $("otherLbl").textContent=mk==="other"&&c!=="other"?c:"เลือกสกุลเงิน";
+  $("otherLbl").textContent=mk==="other"&&c!=="other"?c:tt("เลือกสกุลเงิน","Pick currency");
   showFx("#fBuy .fx-only","b-pair",c!=="THB");
   document.querySelectorAll("#fBuy .cc").forEach(e=>e.textContent=c==="other"?"":c);
   if(c!=="THB"&&c!=="other"&&!keepFx&&prev!==c){$("b-fx").value=rateOf(c);const v=num($("b-fp").value);if(isFinite(v))$("b-tp").value=in2(v*rateOf(c));}
@@ -864,14 +935,14 @@ $("b-recent").addEventListener("click",e=>{const b=e.target.closest("[data-pick]
 $("b-sym").addEventListener("change",e=>{const s=e.target.value.trim().toUpperCase();e.target.value=s;const ex=data.lots.find(l=>l.symbol===s);if(ex)setCcy(ex.ccy);});
 function openBuy(lot){
   editing=lot||null; delArmed=false; bLink.reset();
-  $("buyTitle").textContent=lot?"แก้ไขรายการ":"จดการซื้อ";
+  $("buyTitle").textContent=lot?tt("แก้ไขรายการ","Edit entry"):tt("จดการซื้อ","Log a buy");
   $("b-sym").value=lot?lot.symbol:""; bCcy=null;
   if(lot){const f=fxB(lot);$("b-fx").value=lot.ccy==="THB"?"":f;$("b-fp").value=lot.ccy==="THB"?"":inStr(lot.buyPrice);$("b-tp").value=in2(lot.buyPrice*f);setCcy(lot.ccy,true);}
   else{$("b-fp").value="";$("b-tp").value="";setCcy("THB");}
   $("b-qty").value=lot?lot.qty:""; $("b-date").value=lot?lot.buyDate:today(); $("b-note").value=lot?lot.note||"":"";
-  $("b-err").hidden=true; $("b-submit").disabled=false; $("b-submit").textContent=lot?"บันทึกการแก้ไข":"บันทึก";
+  $("b-err").hidden=true; $("b-submit").disabled=false; $("b-submit").textContent=lot?tt("บันทึกการแก้ไข","Save changes"):tt("บันทึก","Save");
   $("b-foot").hidden=!lot; $("b-unsell").hidden=!(lot&&sold(lot));
-  $("b-del").textContent="ลบรายการนี้"; $("b-del").className="btn";
+  $("b-del").textContent=tt("ลบรายการนี้","Delete this entry"); $("b-del").className="btn";
   setZone("buy","idle"); renderQuick("b-recent",recentSyms(false),!!editing); pvBuy();
   openSheet("bdBuy"); setTimeout(()=>$(lot?"b-qty":"b-sym").focus(),60);
 }
@@ -885,13 +956,13 @@ $("fBuy").addEventListener("submit",e=>{
   const err=m=>{$("b-err").textContent=m;$("b-err").hidden=false;};
   const sym=$("b-sym").value.trim().toUpperCase(), q=num($("b-qty").value), d=$("b-date").value, foreign=bCcy!=="THB";
   const fx=foreign?num($("b-fx").value):1, price=foreign?num($("b-fp").value):num($("b-tp").value);
-  if(!sym){$("b-sym").focus();return err("ใส่ชื่อหุ้นก่อน เช่น PTT หรือ AAPL");}
-  if(bCcy==="other")return err("เลือกสกุลเงินของตลาดอื่นก่อน");
-  if(foreign&&!(fx>0)){$("b-fx").focus();return err("ใส่เรตแลกเงินตอนซื้อ");}
-  if(!(price>0)){$(foreign?"b-fp":"b-tp").focus();return err("ใส่ราคาที่ซื้อ");}
-  if(!(q>0)){$("b-qty").focus();return err("ใส่จำนวนหุ้นที่มากกว่า 0");}
-  if(!d)return err("เลือกวันที่ซื้อ");
-  if(editing&&sold(editing)&&editing.sellDate&&d>editing.sellDate)return err("วันที่ซื้อต้องไม่หลังวันที่ขาย");
+  if(!sym){$("b-sym").focus();return err(tt("ใส่ชื่อหุ้นก่อน เช่น PTT หรือ AAPL","Enter a symbol first, e.g. PTT or AAPL"));}
+  if(bCcy==="other")return err(tt("เลือกสกุลเงินของตลาดอื่นก่อน","Pick the currency for the other market first"));
+  if(foreign&&!(fx>0)){$("b-fx").focus();return err(tt("ใส่เรตแลกเงินตอนซื้อ","Enter the exchange rate at buy"));}
+  if(!(price>0)){$(foreign?"b-fp":"b-tp").focus();return err(tt("ใส่ราคาที่ซื้อ","Enter the buy price"));}
+  if(!(q>0)){$("b-qty").focus();return err(tt("ใส่จำนวนหุ้นที่มากกว่า 0","Enter more than 0 shares"));}
+  if(!d)return err(tt("เลือกวันที่ซื้อ","Pick the buy date"));
+  if(editing&&sold(editing)&&editing.sellDate&&d>editing.sellDate)return err(tt("วันที่ซื้อต้องไม่หลังวันที่ขาย","Buy date can't be after the sell date"));
   const base=editing||{sellPrice:null,sellFx:null,sellDate:null,createdAt:Date.now()};
   const lot={...base,id:editing?editing.id:newId("l"),symbol:sym,ccy:bCcy,buyPrice:price,buyFx:fx,qty:q,buyDate:d,note:$("b-note").value.trim()};
   if(sold(lot)&&(bCcy==="THB"||!(lot.sellFx>0)))lot.sellFx=fx;
@@ -899,17 +970,17 @@ $("fBuy").addEventListener("submit",e=>{
   if(foreign)data.rates[bCcy]=fx;
   if(!save())return;
   sync([{op:"putLot",lot},...(foreign?[{op:"rates",rates:data.rates}]:[])]);
-  const w=!!editing; closeAll(); render(); scheduleDividends(); toast(w?"บันทึกการแก้ไขแล้ว":`จดการซื้อ ${sym} แล้ว`);
+  const w=!!editing; closeAll(); render(); scheduleDividends(); toast(w?tt("บันทึกการแก้ไขแล้ว","Changes saved"):tt(`จดการซื้อ ${sym} แล้ว`,`Logged buy: ${sym}`));
 });
 $("b-del").addEventListener("click",()=>{
   if(!editing)return;
-  if(!delArmed){delArmed=true;$("b-del").textContent="กดอีกครั้งเพื่อยืนยันลบ";$("b-del").className="btn danger";return;}
-  data.lots=data.lots.filter(x=>x.id!==editing.id); save(); sync([{op:"delLot",id:editing.id}]); closeAll(); render(); scheduleDividends(); toast("ลบรายการแล้ว");
+  if(!delArmed){delArmed=true;$("b-del").textContent=tt("กดอีกครั้งเพื่อยืนยันลบ","Tap again to delete");$("b-del").className="btn danger";return;}
+  data.lots=data.lots.filter(x=>x.id!==editing.id); save(); sync([{op:"delLot",id:editing.id}]); closeAll(); render(); scheduleDividends(); toast(tt("ลบรายการแล้ว","Entry deleted"));
 });
 $("b-unsell").addEventListener("click",()=>{
   if(!editing)return;
   const i=data.lots.findIndex(x=>x.id===editing.id); if(i<0)return;
-  data.lots[i]={...editing,sellPrice:null,sellFx:null,sellDate:null}; save(); sync([{op:"putLot",lot:data.lots[i]}]); closeAll(); render(); toast("ย้ายกลับไปเป็นยังถืออยู่แล้ว");
+  data.lots[i]={...editing,sellPrice:null,sellFx:null,sellDate:null}; save(); sync([{op:"putLot",lot:data.lots[i]}]); closeAll(); render(); toast(tt("ย้ายกลับไปเป็นยังถืออยู่แล้ว","Moved back to holdings"));
 });
 
 /* sell */
@@ -917,7 +988,7 @@ const sLink=linkPair($("s-fp"),$("s-tp"),$("s-fx"),()=>pvSell());
 function openSell(lot){
   selling=lot; sLink.reset();
   const foreign=lot.ccy!=="THB";
-  $("s-ctx").innerHTML=`<b>${esc(lot.symbol)}</b> · ซื้อ <span class="num">${baht(buyT(lot))}</span>${foreign?` <span class="num">(${money(lot.buyPrice,lot.ccy)})</span>`:""} × <span class="num">${nfq.format(lot.qty)}</span> หุ้น`;
+  $("s-ctx").innerHTML=`<b>${esc(lot.symbol)}</b> · ${tt("ซื้อ","Buy")} <span class="num">${baht(buyT(lot))}</span>${foreign?` <span class="num">(${money(lot.buyPrice,lot.ccy)})</span>`:""} × <span class="num">${nfq.format(lot.qty)}</span> ${tt("หุ้น","shares")}`;
   showFx("#fSell .sfx-only","s-pair",foreign);
   document.querySelectorAll("#fSell .scc").forEach(e=>e.textContent=lot.ccy);
   $("s-fx").value=foreign?rateOf(lot.ccy):"";
@@ -928,7 +999,7 @@ function openSell(lot){
 function pvSell(){
   if(!selling)return; const t=num($("s-tp").value), q=num($("s-qty").value)||0;
   const b=buyT(selling), pl=isFinite(t)?(t-b)*q:0;
-  $("s-pvl").textContent=pl<-0.004?"ขาดทุน":"กำไร";
+  $("s-pvl").textContent=pl<-0.004?tt("ขาดทุน","Loss"):tt("กำไร","Profit");
   const el=$("s-pv"); el.innerHTML=baht(pl,true)+(isFinite(t)&&b>0?`<small>${pct((t-b)/b)}</small>`:"");
   el.className="num tone-"+tone(pl);
   $("s-hint").hidden=!(q>0&&q<selling.qty);
@@ -941,13 +1012,13 @@ $("fSell").addEventListener("submit",e=>{
   const err=m=>{$("s-err").textContent=m;$("s-err").hidden=false;};
   const l=selling, foreign=l.ccy!=="THB";
   const fx=foreign?num($("s-fx").value):1, p=foreign?num($("s-fp").value):num($("s-tp").value), q=num($("s-qty").value), d=$("s-date").value;
-  if(foreign&&!(fx>0)){$("s-fx").focus();return err("ใส่เรตแลกเงินตอนขาย");}
-  if(!(p>0)){$(foreign?"s-fp":"s-tp").focus();return err("ใส่ราคาที่ขาย");}
-  if(!(q>0))return err("ใส่จำนวนที่ขาย");
-  if(q>l.qty+1e-9)return err(`รายการนี้มี ${nfq.format(l.qty)} หุ้น ขายได้ไม่เกินจำนวนนี้`);
-  if(!d)return err("เลือกวันที่ขาย");
-  if(l.buyDate&&d<l.buyDate)return err("วันที่ขายต้องไม่ก่อนวันที่ซื้อ");
-  const i=data.lots.findIndex(x=>x.id===l.id); if(i<0)return err("ไม่พบรายการนี้แล้ว");
+  if(foreign&&!(fx>0)){$("s-fx").focus();return err(tt("ใส่เรตแลกเงินตอนขาย","Enter the exchange rate at sell"));}
+  if(!(p>0)){$(foreign?"s-fp":"s-tp").focus();return err(tt("ใส่ราคาที่ขาย","Enter the sell price"));}
+  if(!(q>0))return err(tt("ใส่จำนวนที่ขาย","Enter shares sold"));
+  if(q>l.qty+1e-9)return err(tt(`รายการนี้มี ${nfq.format(l.qty)} หุ้น ขายได้ไม่เกินจำนวนนี้`,`This entry has ${nfq.format(l.qty)} shares; you can't sell more`));
+  if(!d)return err(tt("เลือกวันที่ขาย","Pick the sell date"));
+  if(l.buyDate&&d<l.buyDate)return err(tt("วันที่ขายต้องไม่ก่อนวันที่ซื้อ","Sell date can't be before the buy date"));
+  const i=data.lots.findIndex(x=>x.id===l.id); if(i<0)return err(tt("ไม่พบรายการนี้แล้ว","This entry no longer exists"));
   const rest=l.qty-q;
   data.lots[i]={...l,qty:q,sellPrice:p,sellFx:fx,sellDate:d};
   const ops=[{op:"putLot",lot:data.lots[i]}];
@@ -955,7 +1026,7 @@ $("fSell").addEventListener("submit",e=>{
   if(foreign){data.rates[l.ccy]=fx;ops.push({op:"rates",rates:data.rates});}
   if(!save())return;
   sync(ops);
-  closeAll(); render(); toast(rest>1e-9?`จดการขายแล้ว เหลือ ${nfq.format(rest)} หุ้น`:`จดการขาย ${l.symbol} แล้ว`);
+  closeAll(); render(); toast(rest>1e-9?tt(`จดการขายแล้ว เหลือ ${nfq.format(rest)} หุ้น`,`Sell logged, ${nfq.format(rest)} shares left`):tt(`จดการขาย ${l.symbol} แล้ว`,`Logged sell: ${l.symbol}`));
 });
 
 /* dividend */
@@ -971,14 +1042,14 @@ $("d-sym").addEventListener("change",e=>{const s=e.target.value.trim().toUpperCa
 $("d-recent").addEventListener("click",e=>{const b=e.target.closest("[data-pick]");if(!b)return;$("d-sym").value=b.dataset.pick;setDivCcy(b.dataset.c);$(b.dataset.c==="THB"?"d-ta":"d-fa").focus();});
 function openDiv(rec,prefill){
   divEditing=rec||null; divDelArmed=false; dLink.reset();
-  $("divFormTitle").textContent=rec?"แก้ไขปันผล":"จดปันผล";
+  $("divFormTitle").textContent=rec?tt("แก้ไขปันผล","Edit dividend"):tt("จดปันผล","Log dividend");
   const p=rec||prefill||{};
   $("d-sym").value=p.symbol||""; dCcy=null; setDivCcy(p.ccy||ccyOfSym(p.symbol)||"THB");
   if(rec){ if(rec.fx&&dCcy!=="THB")$("d-fx").value=rec.fx; $("d-fa").value=dCcy!=="THB"&&rec.native!=null?inStr(rec.native):""; $("d-ta").value=in2(rec.thb);}
   else if(prefill&&prefill.native){ if(dCcy!=="THB"){$("d-fa").value=inStr(prefill.native);$("d-ta").value=in2(prefill.native*num($("d-fx").value));} else $("d-ta").value=in2(prefill.native);}
   else{$("d-fa").value="";$("d-ta").value="";}
   $("d-date").value=p.date||today();
-  $("d-err").hidden=true; $("d-foot").hidden=!rec; $("d-del").textContent="ลบรายการนี้"; $("d-del").className="btn";
+  $("d-err").hidden=true; $("d-foot").hidden=!rec; $("d-del").textContent=tt("ลบรายการนี้","Delete this entry"); $("d-del").className="btn";
   setZone("div","idle"); renderQuick("d-recent",[...new Map(data.lots.map(l=>[l.symbol,l.ccy]))].slice(0,10),!!rec);
   openSheet("bdDiv"); setTimeout(()=>$(p.symbol?(dCcy==="THB"?"d-ta":"d-fa"):"d-sym").focus(),60);
 }
@@ -988,19 +1059,19 @@ $("fDivForm").addEventListener("submit",e=>{
   const err=m=>{$("d-err").textContent=m;$("d-err").hidden=false;};
   const sym=$("d-sym").value.trim().toUpperCase(), foreign=dCcy!=="THB";
   const fx=foreign?num($("d-fx").value):1, thb=num($("d-ta").value), nat=foreign?num($("d-fa").value):thb, d=$("d-date").value;
-  if(!sym){$("d-sym").focus();return err("ใส่ชื่อหุ้น");}
-  if(!(thb>0)){$(foreign?"d-fa":"d-ta").focus();return err("ใส่ยอดปันผลที่ได้รับ");}
-  if(!d)return err("เลือกวันที่ได้รับ");
+  if(!sym){$("d-sym").focus();return err(tt("ใส่ชื่อหุ้น","Enter a symbol"));}
+  if(!(thb>0)){$(foreign?"d-fa":"d-ta").focus();return err(tt("ใส่ยอดปันผลที่ได้รับ","Enter the amount received"));}
+  if(!d)return err(tt("เลือกวันที่ได้รับ","Pick the date received"));
   const rec={id:divEditing?divEditing.id:newId("d"),symbol:sym,ccy:dCcy,date:d,native:isFinite(nat)?nat:null,fx:foreign?fx:1,thb,createdAt:divEditing?divEditing.createdAt:Date.now()};
   const i=data.divs.findIndex(x=>x.id===rec.id); if(i>=0)data.divs[i]=rec; else data.divs.push(rec);
   if(!save())return;
   sync([{op:"putDiv",div:rec}]);
-  const w=!!divEditing; closeAll(); render(); toast(w?"บันทึกการแก้ไขแล้ว":`จดปันผล ${sym} แล้ว`);
+  const w=!!divEditing; closeAll(); render(); toast(w?tt("บันทึกการแก้ไขแล้ว","Changes saved"):tt(`จดปันผล ${sym} แล้ว`,`Logged dividend: ${sym}`));
 });
 $("d-del").addEventListener("click",()=>{
   if(!divEditing)return;
-  if(!divDelArmed){divDelArmed=true;$("d-del").textContent="กดอีกครั้งเพื่อยืนยันลบ";$("d-del").className="btn danger";return;}
-  data.divs=data.divs.filter(x=>x.id!==divEditing.id); save(); sync([{op:"delDiv",id:divEditing.id}]); closeAll(); render(); toast("ลบปันผลแล้ว");
+  if(!divDelArmed){divDelArmed=true;$("d-del").textContent=tt("กดอีกครั้งเพื่อยืนยันลบ","Tap again to delete");$("d-del").className="btn danger";return;}
+  data.divs=data.divs.filter(x=>x.id!==divEditing.id); save(); sync([{op:"delDiv",id:divEditing.id}]); closeAll(); render(); toast(tt("ลบปันผลแล้ว","Dividend deleted"));
 });
 
 /* ---------- table clicks ---------- */
@@ -1021,7 +1092,7 @@ document.addEventListener("click",e=>{
 $("exportBtn").addEventListener("click",()=>{
   const blob=new Blob([JSON.stringify({app:"stockbook",version:1,exportedAt:new Date().toISOString(),...data},null,2)],{type:"application/json"});
   const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=`stockbook-${today()}.json`; document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(()=>URL.revokeObjectURL(a.href),2000); $("menu").open=false; toast("ดาวน์โหลดไฟล์สำรองแล้ว");
+  setTimeout(()=>URL.revokeObjectURL(a.href),2000); $("menu").open=false; toast(tt("ดาวน์โหลดไฟล์สำรองแล้ว","Backup downloaded"));
 });
 $("importBtn").addEventListener("click",()=>{$("menu").open=false;const f=$("importFile");f.value="";f.click();});
 $("importFile").addEventListener("change",async e=>{
@@ -1029,10 +1100,10 @@ $("importFile").addEventListener("change",async e=>{
   try{
     const j=JSON.parse(await f.text());
     if(!j||!Array.isArray(j.lots))throw 0;
-    if(data.lots.length&&!confirm(`แทนที่ข้อมูลเดิม ${data.lots.length} รายการด้วยไฟล์นี้ (${j.lots.length} รายการ)?`))return;
+    if(data.lots.length&&!confirm(tt(`แทนที่ข้อมูลเดิม ${data.lots.length} รายการด้วยไฟล์นี้ (${j.lots.length} รายการ)?`,`Replace your ${data.lots.length} entries with this file (${j.lots.length} entries)?`)))return;
     data={lots:j.lots,divs:Array.isArray(j.divs)?j.divs:[],rates:{...DEFAULT_RATES,...(j.rates||{})}};
-    save(); sync([{op:"import",lots:data.lots,divs:data.divs,rates:data.rates}]); render(); fetchDividends(false); toast(`นำเข้า ${j.lots.length} รายการแล้ว`);
-  }catch(x){toast("ไฟล์นี้ไม่ใช่ไฟล์สำรองของสมุดพอร์ตหุ้น");}
+    save(); sync([{op:"import",lots:data.lots,divs:data.divs,rates:data.rates}]); render(); fetchDividends(false); toast(tt(`นำเข้า ${j.lots.length} รายการแล้ว`,`Imported ${j.lots.length} entries`));
+  }catch(x){toast(tt("ไฟล์นี้ไม่ใช่ไฟล์สำรองของสมุดพอร์ตหุ้น","This isn't an nd-stockbook backup file"));}
 });
 
 /* ---------- read screenshots (Tesseract, runs in this browser) ---------- */
@@ -1041,13 +1112,15 @@ const IC_WARN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke
 const TESS_URL="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js";
 let workerP=null, scanCtl=null, scanThumb=null, loadPct=null;
 const ZONE={buy:"b-drop",sell:"s-drop",div:"d-drop"};
-const ZONE_TITLE={buy:"อ่านจากภาพคำสั่งซื้อ",sell:"อ่านจากภาพคำสั่งขาย",div:"อ่านจากภาพรายการปันผล"};
+const ZONE_TH={buy:"อ่านจากภาพคำสั่งซื้อ",sell:"อ่านจากภาพคำสั่งขาย",div:"อ่านจากภาพรายการปันผล"};
+const ZONE_EN={buy:"Read a buy order screenshot",sell:"Read a sell order screenshot",div:"Read a dividend screenshot"};
+const ZONE_TITLE=new Proxy({},{get:(_,k)=>(LANG==="en"?ZONE_EN:ZONE_TH)[k]});
 function setZone(kind,state,msg){
   const z=$(ZONE[kind]); if(!z)return; z.dataset.state=state; z.classList.remove("over");
-  z.innerHTML=state==="busy"?`<div class="drop-row"><span class="spin" aria-hidden="true"></span><span class="drop-tx" role="status"><b>${esc(msg||"กำลังอ่านภาพ…")}</b><small>อ่านในเครื่องของคุณ ภาพไม่ถูกส่งออกไปไหน</small></span><button type="button" class="btn" data-scan-stop>หยุด</button></div>`
-   :state==="done"?`<div class="drop-row">${scanThumb?`<img src="${scanThumb}" alt="ภาพที่อัปโหลด">`:""}<span class="drop-tx" role="status"><b>กรอกจากภาพแล้ว</b><small>${esc(msg)}</small></span><button type="button" class="btn" data-scan-pick="${kind}">ภาพใหม่</button></div>`
-   :state==="error"?`<div class="drop-row"><span class="drop-ic">${IC_WARN}</span><span class="drop-tx" role="alert"><b>อ่านภาพไม่สำเร็จ</b><small>${esc(msg)}</small></span><button type="button" class="btn" data-scan-pick="${kind}">เลือกภาพใหม่</button></div>`
-   :`<button type="button" class="drop-btn" data-scan-pick="${kind}"><span class="drop-ic">${IC_IMG}</span><span class="drop-tx"><b>${ZONE_TITLE[kind]}</b><small>เลือกภาพจากแอป Dime หรือวางภาพ (Ctrl+V) ระบบจะกรอกให้ คุณแค่ตรวจแล้วบันทึก</small></span></button>`;
+  z.innerHTML=state==="busy"?`<div class="drop-row"><span class="spin" aria-hidden="true"></span><span class="drop-tx" role="status"><b>${esc(msg||tt("กำลังอ่านภาพ…","Reading image…"))}</b><small>${tt("อ่านในเครื่องของคุณ ภาพไม่ถูกส่งออกไปไหน","Read on your device. The image never leaves it")}</small></span><button type="button" class="btn" data-scan-stop>${tt("หยุด","Stop")}</button></div>`
+   :state==="done"?`<div class="drop-row">${scanThumb?`<img src="${scanThumb}" alt="${tt("ภาพที่อัปโหลด","Uploaded image")}">`:""}<span class="drop-tx" role="status"><b>${tt("กรอกจากภาพแล้ว","Filled from image")}</b><small>${esc(msg)}</small></span><button type="button" class="btn" data-scan-pick="${kind}">${tt("ภาพใหม่","New image")}</button></div>`
+   :state==="error"?`<div class="drop-row"><span class="drop-ic">${IC_WARN}</span><span class="drop-tx" role="alert"><b>${tt("อ่านภาพไม่สำเร็จ","Couldn't read the image")}</b><small>${esc(msg)}</small></span><button type="button" class="btn" data-scan-pick="${kind}">${tt("เลือกภาพใหม่","Pick another image")}</button></div>`
+   :`<button type="button" class="drop-btn" data-scan-pick="${kind}"><span class="drop-ic">${IC_IMG}</span><span class="drop-tx"><b>${ZONE_TITLE[kind]}</b><small>${tt("เลือกภาพจากแอป Dime หรือวางภาพ (Ctrl+V) ระบบจะกรอกให้ คุณแค่ตรวจแล้วบันทึก","Pick a screenshot from the Dime app or paste one (Ctrl+V). The form fills itself; just check and save")}</small></span></button>`;
 }
 function loadScript(src){return new Promise((ok,bad)=>{const s=document.createElement("script");s.src=src;s.onload=ok;s.onerror=bad;document.head.appendChild(s);});}
 function getWorker(onPct){
@@ -1097,48 +1170,48 @@ function heldLotFor(sym,qty){
 }
 function flash(ids){ids.forEach(id=>{const el=$(id);if(!el)return;el.classList.remove("filled");void el.offsetWidth;el.classList.add("filled");});}
 async function scan(file,kind){
-  if(!file||!/^image\//.test(file.type)){toast("ไฟล์นี้ไม่ใช่ภาพ");return;}
+  if(!file||!/^image\//.test(file.type)){toast(tt("ไฟล์นี้ไม่ใช่ภาพ","This file isn't an image"));return;}
   if(kind==="main"){openBuy(null);kind="buy";}
   if(scanCtl)scanCtl.cancelled=true;
   const ctl=scanCtl={kind,cancelled:false};
   if(scanThumb)try{URL.revokeObjectURL(scanThumb);}catch(e){}
   scanThumb=URL.createObjectURL(file);
-  setZone(kind,"busy",workerP?"กำลังอ่านภาพ…":"กำลังเตรียมตัวอ่านภาษาไทย (ครั้งแรกเท่านั้น)…");
+  setZone(kind,"busy",workerP?tt("กำลังอ่านภาพ…","Reading image…"):tt("กำลังเตรียมตัวอ่านภาษาไทย (ครั้งแรกเท่านั้น)…","Preparing the text reader (first time only)…"));
   let text;
   try{
-    const w=await getWorker(p=>{if(!ctl.cancelled&&p<100)setZone(kind,"busy",`กำลังเตรียมตัวอ่านภาษาไทย ${p}%`);});
+    const w=await getWorker(p=>{if(!ctl.cancelled&&p<100)setZone(kind,"busy",tt(`กำลังเตรียมตัวอ่านภาษาไทย ${p}%`,`Preparing the text reader ${p}%`));});
     if(ctl.cancelled)return;
-    setZone(kind,"busy","กำลังอ่านภาพ…");
+    setZone(kind,"busy",tt("กำลังอ่านภาพ…","Reading image…"));
     const canvas=await prepare(file);
     const r=await w.recognize(canvas);
     text=r.data.text||"";
   }catch(e){
-    if(!ctl.cancelled)setZone(kind,"error",navigator.onLine?"เปิดตัวอ่านภาพไม่สำเร็จ ลองรีเฟรชหน้าแล้วลองใหม่":"ต้องต่ออินเทอร์เน็ตครั้งแรกเพื่อโหลดตัวอ่านภาพ");
+    if(!ctl.cancelled)setZone(kind,"error",navigator.onLine?tt("เปิดตัวอ่านภาพไม่สำเร็จ ลองรีเฟรชหน้าแล้วลองใหม่","Couldn't start the image reader. Refresh and try again"):tt("ต้องต่ออินเทอร์เน็ตครั้งแรกเพื่อโหลดตัวอ่านภาพ","Connect to the internet the first time to load the image reader"));
     return;
   }
   if(ctl.cancelled||ctl!==scanCtl)return;
   scanCtl=null;
   if(kind==="div"){fillDiv(DimeParse.parseDividend(text));return;}
   const d=DimeParse.parseOrder(text);
-  if(!d.price&&!d.qty){setZone(kind,"error","ไม่พบราคาหรือจำนวนหุ้นในภาพนี้ ลองแคปหน้ารายละเอียดคำสั่งให้เห็นตัวเลขชัด ๆ");return;}
+  if(!d.price&&!d.qty){setZone(kind,"error",tt("ไม่พบราคาหรือจำนวนหุ้นในภาพนี้ ลองแคปหน้ารายละเอียดคำสั่งให้เห็นตัวเลขชัด ๆ","No price or share count found. Try a screenshot of the order details with clear numbers"));return;}
   if(d.symbol&&!ccyOfSym(d.symbol)&&!/^[A-Z]{1,5}(\.[A-Z]{1,2})?$/.test(d.symbol))d.symbol=null;
   if(kind==="buy"&&d.side==="sell"){
     const lot=d.symbol&&heldLotFor(d.symbol,d.qty);
     if(lot){openSell(lot);fillSell(d);return;}
-    setZone("buy","error",d.symbol?`ภาพนี้เป็นคำสั่งขาย ${d.symbol} แต่ยังไม่มี ${d.symbol} ที่ถืออยู่ในสมุด จดการซื้อก่อนแล้วค่อยจดการขาย`:"ภาพนี้เป็นคำสั่งขาย กดปุ่ม “ขาย” ที่หุ้นตัวนั้นในตาราง แล้วอัปโหลดภาพอีกครั้ง");
+    setZone("buy","error",d.symbol?tt(`ภาพนี้เป็นคำสั่งขาย ${d.symbol} แต่ยังไม่มี ${d.symbol} ที่ถืออยู่ในสมุด จดการซื้อก่อนแล้วค่อยจดการขาย`,`This is a sell order for ${d.symbol}, but you don't hold ${d.symbol} yet. Log the buy first, then the sell`):tt("ภาพนี้เป็นคำสั่งขาย กดปุ่ม “ขาย” ที่หุ้นตัวนั้นในตาราง แล้วอัปโหลดภาพอีกครั้ง","This is a sell order. Tap “Sell” on that stock in the table, then upload the image again"));
     return;
   }
   if(kind==="sell"){
-    if(d.side==="buy"){setZone("sell","error","ภาพนี้เป็นคำสั่งซื้อ ปิดหน้านี้แล้วใช้ “อ่านจากภาพ” ในหน้าจดการซื้อแทน");return;}
-    if(d.symbol&&selling&&d.symbol!==selling.symbol&&ccyOfSym(d.symbol)){setZone("sell","error",`ภาพนี้เป็นหุ้น ${d.symbol} แต่รายการที่กำลังขายคือ ${selling.symbol}`);return;}
+    if(d.side==="buy"){setZone("sell","error",tt("ภาพนี้เป็นคำสั่งซื้อ ปิดหน้านี้แล้วใช้ “อ่านจากภาพ” ในหน้าจดการซื้อแทน","This is a buy order. Close this and read it from Log a buy instead"));return;}
+    if(d.symbol&&selling&&d.symbol!==selling.symbol&&ccyOfSym(d.symbol)){setZone("sell","error",tt(`ภาพนี้เป็นหุ้น ${d.symbol} แต่รายการที่กำลังขายคือ ${selling.symbol}`,`This image is for ${d.symbol}, but you're selling ${selling.symbol}`));return;}
     fillSell(d); return;
   }
   fillBuy(d);
 }
-const missMsg=miss=>miss.length?`ในภาพไม่มี${miss.join(", ")} กรอกเพิ่มก่อนบันทึก`:"ตรวจตัวเลขอีกครั้งแล้วกดบันทึก";
+const missMsg=miss=>miss.length?tt(`ในภาพไม่มี${miss.join(", ")} กรอกเพิ่มก่อนบันทึก`,`Not in the image: ${miss.join(", ")}. Fill these in before saving`):tt("ตรวจตัวเลขอีกครั้งแล้วกดบันทึก","Check the numbers, then save");
 function fillBuy(d){
   const filled=[], miss=[];
-  if(d.symbol){$("b-sym").value=d.symbol;filled.push("b-sym");}else miss.push("ชื่อหุ้น");
+  if(d.symbol){$("b-sym").value=d.symbol;filled.push("b-sym");}else miss.push(tt("ชื่อหุ้น","symbol"));
   const ex=d.symbol&&data.lots.find(l=>l.symbol===d.symbol);
   const cur=(ex&&ex.ccy)||d.cur||"THB";
   if(cur!=="THB"&&d.fx){$("b-fx").value=inStr(d.fx);filled.push("b-fx");}
@@ -1146,9 +1219,9 @@ function fillBuy(d){
   if(d.price){
     if(cur==="THB"){$("b-tp").value=inStr(d.price);filled.push("b-tp");}
     else{$("b-fp").value=inStr(d.price);const r=num($("b-fx").value);if(r>0)$("b-tp").value=in2(d.price*r);filled.push("b-fp","b-tp");}
-  }else miss.push("ราคา");
-  if(d.qty){$("b-qty").value=String(d.qty);filled.push("b-qty");}else miss.push("จำนวนหุ้น");
-  if(cur!=="THB"&&!d.fx)miss.push("เรตแลกเงิน");
+  }else miss.push(tt("ราคา","price"));
+  if(d.qty){$("b-qty").value=String(d.qty);filled.push("b-qty");}else miss.push(tt("จำนวนหุ้น","shares"));
+  if(cur!=="THB"&&!d.fx)miss.push(tt("เรตแลกเงิน","exchange rate"));
   if(d.date){$("b-date").value=d.date;filled.push("b-date");}
   bLink.reset(); pvBuy(); flash(filled); setZone("buy","done",missMsg(miss));
   if(!d.symbol)$("b-sym").focus();
@@ -1156,31 +1229,31 @@ function fillBuy(d){
 function fillSell(d){
   const l=selling; if(!l)return;
   const foreign=l.ccy!=="THB", filled=[], miss=[];
-  if(foreign&&d.fx){$("s-fx").value=inStr(d.fx);filled.push("s-fx");}else if(foreign)miss.push("เรตแลกเงิน");
+  if(foreign&&d.fx){$("s-fx").value=inStr(d.fx);filled.push("s-fx");}else if(foreign)miss.push(tt("เรตแลกเงิน","exchange rate"));
   if(d.price){
     if(foreign){$("s-fp").value=inStr(d.price);const r=num($("s-fx").value);if(r>0)$("s-tp").value=in2(d.price*r);filled.push("s-fp","s-tp");}
     else{$("s-tp").value=inStr(d.price);filled.push("s-tp");}
-  }else miss.push("ราคา");
+  }else miss.push(tt("ราคา","price"));
   let note="";
-  if(d.qty){$("s-qty").value=String(Math.min(d.qty,l.qty));filled.push("s-qty");if(d.qty>l.qty+1e-9)note=` ภาพขาย ${nfq.format(d.qty)} หุ้น แต่รายการนี้มี ${nfq.format(l.qty)} หุ้น`;}
+  if(d.qty){$("s-qty").value=String(Math.min(d.qty,l.qty));filled.push("s-qty");if(d.qty>l.qty+1e-9)note=tt(` ภาพขาย ${nfq.format(d.qty)} หุ้น แต่รายการนี้มี ${nfq.format(l.qty)} หุ้น`,` The image sells ${nfq.format(d.qty)} shares but this entry has ${nfq.format(l.qty)}`);}
   if(d.date){$("s-date").value=d.date;filled.push("s-date");}
   sLink.reset(); pvSell(); flash(filled); setZone("sell","done",missMsg(miss)+note);
 }
 function fillDiv(d){
   const filled=[], miss=[];
   if(d.symbol&&ccyOfSym(d.symbol)){$("d-sym").value=d.symbol;filled.push("d-sym");setDivCcy(ccyOfSym(d.symbol));}
-  else if(!$("d-sym").value)miss.push("ชื่อหุ้น");
+  else if(!$("d-sym").value)miss.push(tt("ชื่อหุ้น","symbol"));
   if(dCcy!=="THB"){
     if(d.fx){$("d-fx").value=inStr(d.fx);filled.push("d-fx");}
     if(d.amountNative){$("d-fa").value=inStr(d.amountNative);$("d-ta").value=in2(d.amountNative*num($("d-fx").value));filled.push("d-fa","d-ta");}
     else if(d.amountThb){$("d-ta").value=in2(d.amountThb);const r=num($("d-fx").value);if(r>0)$("d-fa").value=inStr(d.amountThb/r);filled.push("d-ta");}
-    else miss.push("ยอดเงิน");
+    else miss.push(tt("ยอดเงิน","amount"));
   }else{
-    if(d.amountThb){$("d-ta").value=in2(d.amountThb);filled.push("d-ta");}else miss.push("ยอดเงิน");
+    if(d.amountThb){$("d-ta").value=in2(d.amountThb);filled.push("d-ta");}else miss.push(tt("ยอดเงิน","amount"));
   }
   if(d.date){$("d-date").value=d.date;filled.push("d-date");}
   dLink.reset(); flash(filled);
-  if(!filled.length){setZone("div","error","ไม่พบยอดปันผลในภาพนี้ ลองแคปหน้ารายการปันผลให้เห็นยอดเงินชัด ๆ");return;}
+  if(!filled.length){setZone("div","error",tt("ไม่พบยอดปันผลในภาพนี้ ลองแคปหน้ารายการปันผลให้เห็นยอดเงินชัด ๆ","No dividend amount found. Try a screenshot of the dividend entry with a clear amount"));return;}
   setZone("div","done",missMsg(miss));
 }
 
@@ -1188,9 +1261,9 @@ function fillDiv(d){
 let queue=[], flushing=false, offline=false;
 function setSync(state,text){$("syncState").dataset.s=state;$("syncText").textContent=text;}
 function syncLabel(){
-  if(auth.mode!=="cloud"){setSync("local","บันทึกไว้ในเบราว์เซอร์นี้");return;}
-  if(flushing||queue.length)setSync(offline?"off":"busy",offline?"ยังไม่ได้ซิงก์ จะลองใหม่เมื่อออนไลน์":"กำลังบันทึก…");
-  else setSync("ok",`${auth.email||"บัญชี Google"} · ซิงก์แล้ว`);
+  if(auth.mode!=="cloud"){setSync("local",tt("บันทึกไว้ในเบราว์เซอร์นี้","Saved in this browser"));return;}
+  if(flushing||queue.length)setSync(offline?"off":"busy",offline?tt("ยังไม่ได้ซิงก์ จะลองใหม่เมื่อออนไลน์","Not synced yet. Will retry when online"):tt("กำลังบันทึก…","Saving…"));
+  else setSync("ok",`${auth.email||"Google"} · ${tt("ซิงก์แล้ว","synced")}`);
 }
 async function api(path,opt){
   const r=await fetch(path,{...opt,headers:{"Content-Type":"application/json",...(auth.token?{Authorization:"Bearer "+auth.token}:{}),...((opt&&opt.headers)||{})}});
@@ -1225,8 +1298,8 @@ async function pull(){
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"){if(queue.length)flush();else pull();}});
 
 function applyAccountUI(){
-  const cloud=auth.mode==="cloud", label=auth.name||auth.email||"เมนู";
-  $("menuLabel").textContent=cloud?(auth.name?auth.name.split(" ")[0]:label):"เมนู";
+  const cloud=auth.mode==="cloud", label=auth.name||auth.email||tt("เมนู","Menu");
+  $("menuLabel").textContent=cloud?(auth.name?auth.name.split(" ")[0]:label):tt("เมนู","Menu");
   $("logoutBtn").hidden=!cloud; $("linkBtn").hidden=!cloud;
   $("logoutSub").textContent=cloud?(auth.email||""):"";
   syncLabel();
@@ -1253,7 +1326,7 @@ function offerMove(){
   const done=lsGet("stockbook.moved."+auth.user);
   $("moveBanner").hidden=!(auth.mode==="cloud"&&local.lots.length&&!done);
   render();
-  if(!$("moveBanner").hidden)$("moveText").textContent=`${local.lots.length} รายการ${local.divs.length?` และปันผล ${local.divs.length} รายการ`:""} ย้ายเข้าบัญชีนี้ไหม`;
+  if(!$("moveBanner").hidden)$("moveText").textContent=tt(`${local.lots.length} รายการ${local.divs.length?` และปันผล ${local.divs.length} รายการ`:""} ย้ายเข้าบัญชีนี้ไหม`,`${local.lots.length} entries${local.divs.length?` and ${local.divs.length} dividends`:""}. Move them into this account?`);
 }
 $("moveSkip").addEventListener("click",()=>{lsSet("stockbook.moved."+auth.user,"skip");$("moveBanner").hidden=true;});
 $("moveGo").addEventListener("click",()=>{
@@ -1262,53 +1335,53 @@ $("moveGo").addEventListener("click",()=>{
   data.lots.push(...addL); data.divs.push(...addD); data.rates={...local.rates,...data.rates};
   save(); sync([...addL.map(lot=>({op:"putLot",lot})),...addD.map(div=>({op:"putDiv",div})),{op:"rates",rates:data.rates}]);
   lsSet("stockbook.moved."+auth.user,"yes"); $("moveBanner").hidden=true; render(); scheduleDividends();
-  toast(`ย้าย ${addL.length} รายการเข้าบัญชีแล้ว`);
+  toast(tt(`ย้าย ${addL.length} รายการเข้าบัญชีแล้ว`,`Moved ${addL.length} entries into your account`));
 });
-function expired(){lsSet(SESSION_KEY,null);showGate("เซสชันหมดอายุ กรุณาเข้าสู่ระบบอีกครั้ง");}
+function expired(){lsSet(SESSION_KEY,null);showGate(tt("เซสชันหมดอายุ กรุณาเข้าสู่ระบบอีกครั้ง","Session expired. Please sign in again"));}
 
 /* sign-in screen: Google only */
 const GOOGLE_CLIENT_ID="412163359994-ejpuph3kjaj86mvc11th1t2g24rhb64f.apps.googleusercontent.com";
 let gReady=false;
 function gErr(m){$("g-err").textContent=m||"";$("g-err").hidden=!m;}
-function noStorage(){const n=$("g-note");n.hidden=false;n.innerHTML="<b>ยังไม่ได้เชื่อมฐานข้อมูล</b>ติดต่อผู้ดูแลเว็บ";}
+function noStorage(){const n=$("g-note");n.hidden=false;n.innerHTML=tt("<b>ยังไม่ได้เชื่อมฐานข้อมูล</b>ติดต่อผู้ดูแลเว็บ","<b>Database not connected</b>Contact the site admin");}
 async function onGoogle(resp){
   gErr("");
-  $("gBtn").dataset.r=""; $("gBtn").innerHTML='<span class="gload">กำลังเข้าสู่ระบบ…</span>';
+  $("gBtn").dataset.r=""; $("gBtn").innerHTML='<span class="gload">'+tt("กำลังเข้าสู่ระบบ…","Signing in…")+'</span>';
   try{
     const r=await api("/api/auth",{method:"POST",body:JSON.stringify({action:"google",credential:resp.credential})});
     if(r.status===503){noStorage();throw 0;}
     if(!r.ok)throw 0;
     await enterCloud(r.data.user,r.data.token,false,{email:r.data.email,name:r.data.name});
-    toast(`ยินดีต้อนรับ ${r.data.name||r.data.email||""}`);
-  }catch(e){gErr("เข้าสู่ระบบไม่สำเร็จ ลองใหม่อีกครั้ง");}
+    toast((LANG==="en"?"Welcome ":"ยินดีต้อนรับ ")+`${r.data.name||r.data.email||""}`);
+  }catch(e){gErr(tt("เข้าสู่ระบบไม่สำเร็จ ลองใหม่อีกครั้ง","Sign-in failed. Please try again"));}
   renderGoogleBtn();
 }
 function renderGoogleBtn(){
   const box=$("gBtn");
-  if(!(window.google&&google.accounts&&google.accounts.id)){box.dataset.r="";box.innerHTML='<span class="gload">กำลังโหลดปุ่ม Google…</span>';return false;}
+  if(!(window.google&&google.accounts&&google.accounts.id)){box.dataset.r="";box.innerHTML='<span class="gload">'+tt("กำลังโหลดปุ่ม Google…","Loading Google button…")+'</span>';return false;}
   if(!gReady){google.accounts.id.initialize({client_id:GOOGLE_CLIENT_ID,callback:onGoogle,auto_select:true,cancel_on_tap_outside:true,use_fedcm_for_prompt:true});gReady=true;}
   if(box.dataset.r==="1")return true;
   box.dataset.r="1"; box.innerHTML="";
   const w=Math.min(400,Math.max(220,Math.floor(box.clientWidth)||320));
-  google.accounts.id.renderButton(box,{theme:"outline",size:"large",shape:"pill",text:"continue_with",locale:"th",width:w,logo_alignment:"center"});
+  google.accounts.id.renderButton(box,{theme:"outline",size:"large",shape:"pill",text:"continue_with",locale:LANG==="en"?"en":"th",width:w,logo_alignment:"center"});
   return true;
 }
-function whenGoogle(cb,tries){tries=tries||0;if(window.google&&google.accounts&&google.accounts.id)return cb();if(tries>80){gErr("โหลดปุ่ม Google ไม่สำเร็จ ตรวจอินเทอร์เน็ตแล้วรีเฟรชหน้า");return;}setTimeout(()=>whenGoogle(cb,tries+1),150);}
+function whenGoogle(cb,tries){tries=tries||0;if(window.google&&google.accounts&&google.accounts.id)return cb();if(tries>80){gErr(tt("โหลดปุ่ม Google ไม่สำเร็จ ตรวจอินเทอร์เน็ตแล้วรีเฟรชหน้า","Couldn't load the Google button. Check your connection and refresh"));return;}setTimeout(()=>whenGoogle(cb,tries+1),150);}
 function showGate(msg){
   closeAll(); $("gate").hidden=false; gErr(msg||"");
   whenGoogle(()=>{renderGoogleBtn();});
 }
-function expired(){lsSet(SESSION_KEY,null);showGate("เซสชันหมดอายุ กรุณาเข้าสู่ระบบอีกครั้ง");}
+function expired(){lsSet(SESSION_KEY,null);showGate(tt("เซสชันหมดอายุ กรุณาเข้าสู่ระบบอีกครั้ง","Session expired. Please sign in again"));}
 $("logoutBtn").addEventListener("click",async()=>{
   $("menu").open=false;
-  if(queue.length&&!confirm("ยังมีรายการที่ยังไม่ได้ซิงก์ ออกจากระบบตอนนี้รายการเหล่านั้นจะหายไป ออกเลยไหม?"))return;
+  if(queue.length&&!confirm(tt("ยังมีรายการที่ยังไม่ได้ซิงก์ ออกจากระบบตอนนี้รายการเหล่านั้นจะหายไป ออกเลยไหม?","Some entries haven't synced. Signing out now will lose them. Sign out anyway?")))return;
   try{await api("/api/auth",{method:"POST",body:JSON.stringify({action:"logout"})});}catch(e){}
   try{google.accounts.id.disableAutoSelect();}catch(e){}
   const u=auth.user;
   lsSet(SESSION_KEY,null); lsSet("stockbook.cache."+u,null); lsSet("stockbook.queue."+u,null); lsSet(MODE_KEY,null);
   auth={mode:"local",user:null,token:null}; queue=[]; data=shape(null); render();
   $("linkBanner").hidden=true; $("moveBanner").hidden=true;
-  showGate(); toast("ออกจากระบบแล้ว");
+  showGate(); toast(tt("ออกจากระบบแล้ว","Signed out"));
 });
 
 /* move data from an old username + PIN account */
@@ -1320,8 +1393,8 @@ $("fLink").addEventListener("submit",async e=>{
   e.preventDefault();
   const err=m=>{$("l-err").textContent=m;$("l-err").hidden=false;};
   const u=$("l-user").value.trim(), pin=$("l-pin").value.trim();
-  if(u.length<2){$("l-user").focus();return err("ใส่ชื่อผู้ใช้เดิม");}
-  if(!/^\d{4,8}$/.test(pin)){$("l-pin").focus();return err("PIN เป็นตัวเลข 4–8 หลัก");}
+  if(u.length<2){$("l-user").focus();return err(tt("ใส่ชื่อผู้ใช้เดิม","Enter your old username"));}
+  if(!/^\d{4,8}$/.test(pin)){$("l-pin").focus();return err(tt("PIN เป็นตัวเลข 4–8 หลัก","PIN is 4–8 digits"));}
   $("l-submit").disabled=true;
   try{
     if(queue.length)await flush();
@@ -1329,15 +1402,27 @@ $("fLink").addEventListener("submit",async e=>{
     if(r.status===401&&r.data.error==="not_signed_in"){closeAll();expired();return;}
     if(!r.ok){
       const c=r.data.error;
-      throw {msg:c==="wrong_login"?(r.data.left>0?`ชื่อผู้ใช้หรือ PIN ไม่ถูกต้อง (ลองได้อีก ${r.data.left} ครั้ง)`:"ชื่อผู้ใช้หรือ PIN ไม่ถูกต้อง"):c==="locked"?"ใส่ PIN ผิดหลายครั้ง บัญชีถูกล็อก 15 นาที":c==="already_linked"?"บัญชีนี้ย้ายเข้าบัญชี Google อื่นไปแล้ว":"ย้ายข้อมูลไม่สำเร็จ ลองใหม่อีกครั้ง"};
+      throw {msg:c==="wrong_login"?(r.data.left>0?tt(`ชื่อผู้ใช้หรือ PIN ไม่ถูกต้อง (ลองได้อีก ${r.data.left} ครั้ง)`,`Wrong username or PIN (${r.data.left} tries left)`):tt("ชื่อผู้ใช้หรือ PIN ไม่ถูกต้อง","Wrong username or PIN")):c==="locked"?tt("ใส่ PIN ผิดหลายครั้ง บัญชีถูกล็อก 15 นาที","Too many wrong PINs. Locked for 15 minutes"):c==="already_linked"?tt("บัญชีนี้ย้ายเข้าบัญชี Google อื่นไปแล้ว","This account was already moved into another Google account"):tt("ย้ายข้อมูลไม่สำเร็จ ลองใหม่อีกครั้ง","Couldn't move the data. Please try again")};
     }
     lsSet("stockbook.linkasked."+auth.user,"1"); $("linkBanner").hidden=true;
     closeAll(); await pull(); scheduleDividends();
-    toast(`ย้ายแล้ว ${r.data.lots} รายการ${r.data.divs?` และปันผล ${r.data.divs} รายการ`:""}`);
-  }catch(x){$("l-submit").disabled=false;err(x&&x.msg?x.msg:"เชื่อมต่อไม่ได้ ตรวจอินเทอร์เน็ตแล้วลองใหม่");}
+    toast(tt(`ย้ายแล้ว ${r.data.lots} รายการ${r.data.divs?` และปันผล ${r.data.divs} รายการ`:""}`,`Moved ${r.data.lots} entries${r.data.divs?` and ${r.data.divs} dividends`:""}`));
+  }catch(x){$("l-submit").disabled=false;err(x&&x.msg?x.msg:tt("เชื่อมต่อไม่ได้ ตรวจอินเทอร์เน็ตแล้วลองใหม่","Can't connect. Check your internet and try again"));}
 });
 
+function setLang(l,init){
+  if(l!=="th"&&l!=="en")return;
+  LANG=l; try{localStorage.setItem(LANG_KEY,l);}catch(e){}
+  document.documentElement.lang=l;
+  document.querySelectorAll("[data-lang]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.lang===l)));
+  i18nStatic();
+  if(init)return;
+  applyAccountUI(); render();
+  const box=$("gBtn"); if(!$("gate").hidden&&box.dataset.r==="1"){box.dataset.r="";renderGoogleBtn();}
+}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-lang]");if(b)setLang(b.dataset.lang);});
 function boot(){
+  setLang(LANG,true);
   let sess=null; try{sess=JSON.parse(lsGet(SESSION_KEY)||"null");}catch(e){}
   // only Google sessions are kept; older username+PIN sessions sign in again with Google
   if(sess&&sess.user&&sess.token&&String(sess.user).startsWith("g:")){enterCloud(sess.user,sess.token,false,{email:sess.email,name:sess.name});return;}
