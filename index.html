@@ -563,7 +563,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.8)}
 <input type="file" id="scanFile" accept="image/png,image/jpeg,image/webp" hidden>
 <input type="file" id="importFile" accept="application/json,.json" hidden>
 
-<script src="/parse.js?v=2"></script>
+<script src="/parse.js?v=3"></script>
 <script>
 (function(){
 "use strict";
@@ -652,7 +652,7 @@ const $=id=>document.getElementById(id);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const nf=new Intl.NumberFormat("th-TH",{minimumFractionDigits:2,maximumFractionDigits:2});
 const nf4=new Intl.NumberFormat("th-TH",{minimumFractionDigits:2,maximumFractionDigits:4});
-const nfq=new Intl.NumberFormat("th-TH",{maximumFractionDigits:6});
+const nfq=new Intl.NumberFormat("th-TH",{maximumFractionDigits:7});
 const money=(v,c,sign)=>{const s=sign&&v>0.004?"+":v<-0.004?"−":"";return s+(SYM[c]||"")+nf.format(Math.abs(v))+(SYM[c]?"":" "+c);};
 const baht=(v,sign)=>money(v,"THB",sign);
 const pct=v=>(v>0.00004?"+":v<-0.00004?"−":"")+nf.format(Math.abs(v*100))+"%";
@@ -671,9 +671,16 @@ const fxB=l=>l.ccy==="THB"?1:(+l.buyFx||rateOf(l.ccy));
 const fxS=l=>l.ccy==="THB"?1:(+l.sellFx||rateOf(l.ccy));
 const buyT=l=>l.buyPrice*fxB(l);
 const sellT=l=>l.sellPrice*fxS(l);
-const costT=l=>buyT(l)*l.qty;
-const plT=l=>sold(l)?(sellT(l)-buyT(l))*l.qty:0;
-const pctT=l=>sold(l)&&buyT(l)>0?(sellT(l)-buyT(l))/buyT(l):0;
+/* Dime's real totals (fees included) are kept as buyAmt / sellAmt in the stock's own
+   currency. They are used only while they still match price × shares within 3%, so a
+   manual edit of price or shares falls back to price × shares. */
+const near=(a,b)=>a>0&&b>0&&Math.abs(a-b)/b<0.03;
+const costN=l=>near(+l.buyAmt,l.buyPrice*l.qty)?+l.buyAmt:l.buyPrice*l.qty;
+const procN=l=>sold(l)?(near(+l.sellAmt,l.sellPrice*l.qty)?+l.sellAmt:l.sellPrice*l.qty):0;
+const costT=l=>costN(l)*fxB(l);
+const procT=l=>procN(l)*fxS(l);
+const plT=l=>sold(l)?procT(l)-costT(l):0;
+const pctT=l=>sold(l)&&costT(l)>0?plT(l)/costT(l):0;
 const mktChip=c=>`<span class="chip ${c==="THB"?"th":""}">${c==="THB"?tt("ไทย","TH"):esc(c)}</span>`;
 const ccyOrder=(a,b)=>a==="THB"?-1:b==="THB"?1:a.localeCompare(b);
 const ccyOfSym=s=>{const l=lots().find(x=>x.symbol===s);return l?l.ccy:null;};
@@ -770,7 +777,7 @@ function render(){
 function sortLots(arr){
   const {key,dir}=st.sort, a=arr.slice();
   if(key==="default")return a.sort((x,y)=>{if(sold(x)!==sold(y))return sold(x)?1:-1;const dx=x.sellDate||x.buyDate,dy=y.sellDate||y.buyDate;return dx>dy?-1:dx<dy?1:(y.createdAt||0)-(x.createdAt||0);});
-  const val={symbol:l=>l.symbol,buy:costT,sell:l=>sold(l)?sellT(l)*l.qty:-Infinity,cost:costT,pl:l=>sold(l)?pctT(l):-Infinity}[key];
+  const val={symbol:l=>l.symbol,buy:costT,sell:l=>sold(l)?procT(l):-Infinity,cost:costT,pl:l=>sold(l)?pctT(l):-Infinity}[key];
   return a.sort((x,y)=>{const vx=val(x),vy=val(y);return (vx>vy?1:vx<vy?-1:0)*dir;});
 }
 function th(label,key,cls){
@@ -781,7 +788,7 @@ const orig=(p,c)=>c==="THB"?"":money(p,c)+" · ";
 function tableHTML(list,sample){
   const S=list.filter(sold);
   const tpl=S.reduce((a,l)=>a+plT(l),0), tc=S.reduce((a,l)=>a+costT(l),0), tr=tc>0?tpl/tc:0;
-  const ts=S.reduce((a,l)=>a+sellT(l)*l.qty,0);
+  const ts=S.reduce((a,l)=>a+procT(l),0);
   const foot=S.length?`<tr><td>${tt("รวมที่ขายแล้ว","Total sold")}</td><td class="m-only"></td><td class="r num d-only">${baht(tc)}</td><td class="r num d-only">${baht(ts)}</td><td class="r plc"><div class="main num tone-${tone(tpl)}">${baht(tpl,true)}</div><div class="sub num tone-${tone(tpl)}">${pct(tr)}</div></td><td class="d-only"></td></tr>`:"";
   return `<div class="tblwrap"><table class="tbl"><thead><tr>
     ${th(tt("หุ้น","Stock"),"symbol")}<th class="m-only">${tt("ยอด (บาท)","Amount (THB)")}</th>${th(tt("ยอดซื้อ","Buy total"),"buy","r d-only")}${th(tt("ยอดขาย","Sell total"),"sell","r d-only")}${th(tt("กำไร / ขาดทุน","Profit / loss"),"pl","r plc")}<th class="d-only"><span style="position:absolute;left:-9999px">${tt("จัดการ","Actions")}</span></th>
@@ -789,9 +796,9 @@ function tableHTML(list,sample){
     const s=sold(l), p=plT(l);
     return `<tr${sample?"":` class="tap" data-edit="${esc(l.id)}"`}>
       <td><div class="sym-wrap">${avatar(l.symbol)}<div><div class="symn">${esc(l.symbol)}${mktChip(l.ccy)}</div><div class="sub num">${nfq.format(l.qty)} ${tt("หุ้น","shares")}${l.note?" · "+esc(l.note):""}</div></div></div></td>
-      <td class="m-only"><div class="mline num"><span class="mk">${tt("ซื้อ","Buy")}</span>${baht(costT(l))}</div><div class="mline num"><span class="mk">${tt("ขาย","Sell")}</span>${s?baht(sellT(l)*l.qty):`<span class="chip hold">${tt("ยังถือ","Holding")}</span>`}</div></td>
-      <td class="r d-only"><div class="main num">${baht(costT(l))}</div><div class="sub num">${orig(l.buyPrice*l.qty,l.ccy)}${fdate(l.buyDate)}</div></td>
-      <td class="r d-only">${s?`<div class="main num">${baht(sellT(l)*l.qty)}</div><div class="sub num">${orig(l.sellPrice*l.qty,l.ccy)}${fdate(l.sellDate)}</div>`:`<span class="chip hold">${tt("ยังถือ","Holding")}</span>`}</td>
+      <td class="m-only"><div class="mline num"><span class="mk">${tt("ซื้อ","Buy")}</span>${baht(costT(l))}</div><div class="mline num"><span class="mk">${tt("ขาย","Sell")}</span>${s?baht(procT(l)):`<span class="chip hold">${tt("ยังถือ","Holding")}</span>`}</div></td>
+      <td class="r d-only"><div class="main num">${baht(costT(l))}</div><div class="sub num">${orig(costN(l),l.ccy)}${fdate(l.buyDate)}</div></td>
+      <td class="r d-only">${s?`<div class="main num">${baht(procT(l))}</div><div class="sub num">${orig(procN(l),l.ccy)}${fdate(l.sellDate)}</div>`:`<span class="chip hold">${tt("ยังถือ","Holding")}</span>`}</td>
       <td class="r plc">${s?`<span class="plpill num ${tone(p)}">${baht(p,true)}</span><div class="sub num tone-${tone(p)}" style="margin-top:4px">${pct(pctT(l))}</div>`:(sample?`<span class="muted">—</span>`:`<span class="muted">—</span>`)}</td>
       <td class="d-only">${sample?"":`<div class="acts"><button type="button" class="mini" data-edit="${esc(l.id)}">${tt("แก้ไข","Edit")}</button></div>`}</td></tr>`;
   }).join("")+`</tbody>${foot?`<tfoot>${foot}</tfoot>`:""}</table></div>`;
@@ -881,7 +888,7 @@ function renderQuick(boxId,list,hide){const box=$(boxId);box.hidden=!list.length
 $("b-recent").addEventListener("click",e=>{const b=e.target.closest("[data-pick]");if(!b)return;$("b-sym").value=b.dataset.pick;setCcy(b.dataset.c);$(b.dataset.c==="THB"?"b-tp":"b-fp").focus();});
 $("b-sym").addEventListener("change",e=>{const s=e.target.value.trim().toUpperCase();e.target.value=s;const ex=data.lots.find(l=>l.symbol===s);if(ex)setCcy(ex.ccy);});
 function openBuy(lot){
-  editing=lot||null; delArmed=false; bLink.reset();
+  editing=lot||null; delArmed=false; bLink.reset(); scanBuyAmt=null;
   $("buyTitle").textContent=lot?tt("แก้ไขรายการ","Edit entry"):tt("จดการซื้อ","Log a buy");
   $("b-sym").value=lot?lot.symbol:""; bCcy=null;
   if(lot){const f=fxB(lot);$("b-fx").value=lot.ccy==="THB"?"":f;$("b-fp").value=lot.ccy==="THB"?"":inStr(lot.buyPrice);$("b-tp").value=in2(lot.buyPrice*f);setCcy(lot.ccy,true);}
@@ -893,9 +900,13 @@ function openBuy(lot){
   setZone("buy","idle"); renderQuick("b-recent",recentSyms(false),!!editing); pvBuy();
   openSheet("bdBuy"); setTimeout(()=>$(lot?"b-qty":"b-sym").focus(),60);
 }
+let scanBuyAmt=null;
+function buyAmtFor(price,q){const prev=editing&&editing.buyAmt;return near(scanBuyAmt,price*q)?scanBuyAmt:near(+prev,price*q)?+prev:null;}
 function pvBuy(){
-  const q=num($("b-qty").value)||0, t=num($("b-tp").value)||0, f=num($("b-fp").value)||0;
-  $("b-pv").innerHTML=baht(t*q)+(bCcy&&bCcy!=="THB"&&bCcy!=="other"&&f*q>0?`<small>${money(f*q,bCcy)}</small>`:"");
+  const q=num($("b-qty").value)||0, t=num($("b-tp").value)||0, f=num($("b-fp").value)||0, foreign=bCcy&&bCcy!=="THB"&&bCcy!=="other";
+  const amt=buyAmtFor(foreign?f:t,q), fx=foreign?(num($("b-fx").value)||0):1;
+  const nat=amt!=null?amt:(foreign?f*q:t*q), thb=amt!=null?amt*fx:t*q;
+  $("b-pv").innerHTML=baht(thb)+(foreign&&nat>0?`<small>${money(nat,bCcy)}</small>`:"")+(amt!=null?`<small>${tt("รวมค่าธรรมเนียมแล้ว","fees included")}</small>`:"");
 }
 $("b-qty").addEventListener("input",pvBuy);
 $("fBuy").addEventListener("submit",e=>{
@@ -911,7 +922,7 @@ $("fBuy").addEventListener("submit",e=>{
   if(!d)return err(tt("เลือกวันที่ซื้อ","Pick the buy date"));
   if(editing&&sold(editing)&&editing.sellDate&&d>editing.sellDate)return err(tt("วันที่ซื้อต้องไม่หลังวันที่ขาย","Buy date can't be after the sell date"));
   const base=editing||{sellPrice:null,sellFx:null,sellDate:null,createdAt:Date.now()};
-  const lot={...base,id:editing?editing.id:newId("l"),symbol:sym,ccy:bCcy,buyPrice:price,buyFx:fx,qty:q,buyDate:d,note:$("b-note").value.trim()};
+  const lot={...base,id:editing?editing.id:newId("l"),symbol:sym,ccy:bCcy,buyPrice:price,buyFx:fx,qty:q,buyDate:d,note:$("b-note").value.trim(),buyAmt:buyAmtFor(price,q)};
   if(sold(lot)&&(bCcy==="THB"||!(lot.sellFx>0)))lot.sellFx=fx;
   const i=data.lots.findIndex(x=>x.id===lot.id); if(i>=0)data.lots[i]=lot; else data.lots.push(lot);
   if(foreign)data.rates[bCcy]=fx;
@@ -928,49 +939,67 @@ $("b-sell").addEventListener("click",()=>{if(editing&&!sold(editing))openSell(ed
 $("b-unsell").addEventListener("click",()=>{
   if(!editing)return;
   const i=data.lots.findIndex(x=>x.id===editing.id); if(i<0)return;
-  data.lots[i]={...editing,sellPrice:null,sellFx:null,sellDate:null}; save(); sync([{op:"putLot",lot:data.lots[i]}]); closeAll(); render(); toast(tt("ย้ายกลับไปเป็นยังถืออยู่แล้ว","Moved back to holdings"));
+  data.lots[i]={...editing,sellPrice:null,sellFx:null,sellDate:null,sellAmt:null}; save(); sync([{op:"putLot",lot:data.lots[i]}]); closeAll(); render(); toast(tt("ย้ายกลับไปเป็นยังถืออยู่แล้ว","Moved back to holdings"));
 });
 
 /* sell */
 const sLink=linkPair($("s-fp"),$("s-tp"),$("s-fx"),()=>pvSell());
+/* Selling covers every open lot of the same stock: the lot you picked first, then the
+   oldest. A leftover smaller than 0.0001 share (or worth under 1 cent) counts as sold. */
+function heldLots(lot){return [lot,...data.lots.filter(x=>x!==lot&&x.id!==lot.id&&x.symbol===lot.symbol&&x.ccy===lot.ccy&&!sold(x))].sort((a,b)=>(a.buyDate||"")<(b.buyDate||"")?-1:(a.buyDate||"")>(b.buyDate||"")?1:(a.createdAt||0)-(b.createdAt||0));}
+const heldQty=lot=>+heldLots(lot).reduce((a,x)=>a+x.qty,0).toFixed(9);
+function snapQty(q,lot,price){const H=heldQty(lot),rest=H-q;return rest>0&&(rest<1e-4||(price>0&&rest*price<0.01))?H:q;}
+function allocate(lot,q){const out=[];let rem=q;for(const x of heldLots(lot)){if(rem<=1e-12)break;const take=Math.min(x.qty,rem);out.push({lot:x,take});rem-=take;}return out;}
+let scanSellAmt=null;
 function openSell(lot){
-  selling=lot; sLink.reset();
+  selling=lot; sLink.reset(); scanSellAmt=null;
   const foreign=lot.ccy!=="THB";
-  $("s-ctx").innerHTML=`<b>${esc(lot.symbol)}</b> · ${tt("ซื้อ","Buy")} <span class="num">${baht(buyT(lot))}</span>${foreign?` <span class="num">(${money(lot.buyPrice,lot.ccy)})</span>`:""} × <span class="num">${nfq.format(lot.qty)}</span> ${tt("หุ้น","shares")}`;
-  showFx("#fSell .sfx-only","s-pair",foreign);
-  document.querySelectorAll("#fSell .scc").forEach(e=>e.textContent=lot.ccy);
-  $("s-fx").value=foreign?rateOf(lot.ccy):"";
-  $("s-fp").value=""; $("s-tp").value=""; $("s-qty").value=lot.qty; $("s-date").value=today();
+  const hl=heldLots(lot), hq=heldQty(lot), hc=hl.reduce((a,x)=>a+costT(x),0), hn=hl.reduce((a,x)=>a+costN(x),0);
+  $("s-ctx").innerHTML=`<b>${esc(lot.symbol)}</b> · ${tt("ถืออยู่","Holding")} <span class="num">${nfq.format(hq)}</span> ${tt("หุ้น","shares")} · ${tt("ต้นทุน","Cost")} <span class="num">${baht(hc)}</span>${foreign?` <span class="num">(${money(hn,lot.ccy)})</span>`:""}${hl.length>1?`<br><span class="muted">${tt(`รวม ${hl.length} รายการซื้อ ขายแล้วระบบจะปิดรายการเก่าสุดก่อน`,`From ${hl.length} buys; the oldest close first`)}</span>`:""}`;
+  $("s-fp").value=""; $("s-tp").value=""; $("s-qty").value=heldQty(lot); $("s-date").value=today();
   $("s-err").hidden=true; $("s-submit").disabled=false; setZone("sell","idle"); pvSell();
   openSheet("bdSell"); setTimeout(()=>$(foreign?"s-fp":"s-tp").focus(),60);
 }
+function sellCalc(){
+  const l=selling, foreign=l.ccy!=="THB";
+  const fx=foreign?num($("s-fx").value):1, p=foreign?num($("s-fp").value):num($("s-tp").value);
+  const q=snapQty(num($("s-qty").value)||0,l,p);
+  const gross=p*q, net=near(scanSellAmt,gross)?scanSellAmt:gross;
+  const cost=allocate(l,q).reduce((a,{lot,take})=>a+costT(lot)*take/lot.qty,0);
+  return {fx,p,q,net,cost,proceeds:net*(fx||0),fee:net!==gross};
+}
 function pvSell(){
-  if(!selling)return; const t=num($("s-tp").value), q=num($("s-qty").value)||0;
-  const b=buyT(selling), pl=isFinite(t)?(t-b)*q:0;
+  if(!selling)return; const c=sellCalc();
+  const pl=c.p>0&&c.fx>0?c.proceeds-c.cost:0;
   $("s-pvl").textContent=pl<-0.004?tt("ขาดทุน","Loss"):tt("กำไร","Profit");
-  const el=$("s-pv"); el.innerHTML=baht(pl,true)+(isFinite(t)&&b>0?`<small>${pct((t-b)/b)}</small>`:"");
+  const el=$("s-pv"); el.innerHTML=baht(pl,true)+(c.p>0&&c.cost>0?`<small>${pct(pl/c.cost)}</small>`:"")+(c.fee?`<small>${tt("หักค่าธรรมเนียมแล้ว","after fees")}</small>`:"");
   el.className="num tone-"+tone(pl);
-  $("s-hint").hidden=!(q>0&&q<selling.qty);
+  $("s-hint").hidden=!(c.q>0&&c.q<heldQty(selling)-1e-9);
 }
 $("s-qty").addEventListener("input",pvSell);
-$("s-all").addEventListener("click",()=>{if(!selling)return;$("s-qty").value=selling.qty;pvSell();});
-$("s-half").addEventListener("click",()=>{if(!selling)return;$("s-qty").value=Math.floor(selling.qty/2)||selling.qty/2;pvSell();});
+$("s-all").addEventListener("click",()=>{if(!selling)return;$("s-qty").value=heldQty(selling);pvSell();});
+$("s-half").addEventListener("click",()=>{if(!selling)return;const H=heldQty(selling);$("s-qty").value=Math.floor(H/2)||+(H/2).toFixed(7);pvSell();});
 $("fSell").addEventListener("submit",e=>{
   e.preventDefault();
   const err=m=>{$("s-err").textContent=m;$("s-err").hidden=false;};
   const l=selling, foreign=l.ccy!=="THB";
-  const fx=foreign?num($("s-fx").value):1, p=foreign?num($("s-fp").value):num($("s-tp").value), q=num($("s-qty").value), d=$("s-date").value;
+  const c=sellCalc(), fx=c.fx, p=c.p, q=c.q, d=$("s-date").value, H=heldQty(l);
   if(foreign&&!(fx>0)){$("s-fx").focus();return err(tt("ใส่เรตแลกเงินตอนขาย","Enter the exchange rate at sell"));}
   if(!(p>0)){$(foreign?"s-fp":"s-tp").focus();return err(tt("ใส่ราคาที่ขาย","Enter the sell price"));}
   if(!(q>0))return err(tt("ใส่จำนวนที่ขาย","Enter shares sold"));
-  if(q>l.qty+1e-9)return err(tt(`รายการนี้มี ${nfq.format(l.qty)} หุ้น ขายได้ไม่เกินจำนวนนี้`,`This entry has ${nfq.format(l.qty)} shares; you can't sell more`));
+  if(q>H+1e-9)return err(tt(`ถือ ${l.symbol} อยู่ ${nfq.format(H)} หุ้น ขายได้ไม่เกินจำนวนนี้`,`You hold ${nfq.format(H)} ${l.symbol}; you can't sell more`));
   if(!d)return err(tt("เลือกวันที่ขาย","Pick the sell date"));
-  if(l.buyDate&&d<l.buyDate)return err(tt("วันที่ขายต้องไม่ก่อนวันที่ซื้อ","Sell date can't be before the buy date"));
-  const i=data.lots.findIndex(x=>x.id===l.id); if(i<0)return err(tt("ไม่พบรายการนี้แล้ว","This entry no longer exists"));
-  const rest=l.qty-q;
-  data.lots[i]={...l,qty:q,sellPrice:p,sellFx:fx,sellDate:d};
-  const ops=[{op:"putLot",lot:data.lots[i]}];
-  if(rest>1e-9){const nl={...l,id:newId("l"),qty:rest,sellPrice:null,sellFx:null,sellDate:null,createdAt:Date.now()};data.lots.push(nl);ops.push({op:"putLot",lot:nl});}
+  const parts=allocate(l,q);
+  if(parts.some(x=>x.lot.buyDate&&d<x.lot.buyDate))return err(tt("วันที่ขายต้องไม่ก่อนวันที่ซื้อ","Sell date can't be before the buy date"));
+  const ops=[], rest=H-q>1e-9?H-q:0;
+  for(const {lot:x,take} of parts){
+    const i=data.lots.findIndex(y=>y.id===x.id); if(i<0)return err(tt("ไม่พบรายการนี้แล้ว","This entry no longer exists"));
+    const full=take>=x.qty-1e-9, share=full?1:take/x.qty;
+    const sellAmt=+(c.net*take/q).toFixed(6), buyAmt=near(+x.buyAmt,x.buyPrice*x.qty)?+(x.buyAmt*share).toFixed(6):null;
+    data.lots[i]={...x,qty:full?x.qty:take,buyAmt,sellPrice:p,sellFx:fx,sellDate:d,sellAmt};
+    ops.push({op:"putLot",lot:data.lots[i]});
+    if(!full){const r=x.qty-take;const nl={...x,id:newId("l"),qty:+r.toFixed(9),buyAmt:buyAmt!=null?+(x.buyAmt-buyAmt).toFixed(6):null,sellPrice:null,sellFx:null,sellDate:null,sellAmt:null,createdAt:Date.now()};data.lots.push(nl);ops.push({op:"putLot",lot:nl});}
+  }
   if(foreign){data.rates[l.ccy]=fx;ops.push({op:"rates",rates:data.rates});}
   if(!save())return;
   sync(ops);
@@ -1158,6 +1187,7 @@ async function scan(file,kind){
 }
 const missMsg=miss=>miss.length?tt(`ในภาพไม่มี${miss.join(", ")} กรอกเพิ่มก่อนบันทึก`,`Not in the image: ${miss.join(", ")}. Fill these in before saving`):tt("ตรวจตัวเลขอีกครั้งแล้วกดบันทึก","Check the numbers, then save");
 function fillBuy(d){
+  scanBuyAmt=d.amount||null;
   const filled=[], miss=[];
   if(d.symbol){$("b-sym").value=d.symbol;filled.push("b-sym");}else miss.push(tt("ชื่อหุ้น","symbol"));
   const ex=d.symbol&&data.lots.find(l=>l.symbol===d.symbol);
@@ -1175,7 +1205,7 @@ function fillBuy(d){
   if(!d.symbol)$("b-sym").focus();
 }
 function fillSell(d){
-  const l=selling; if(!l)return;
+  const l=selling; if(!l)return; scanSellAmt=d.amount||null; const H=heldQty(l);
   const foreign=l.ccy!=="THB", filled=[], miss=[];
   if(foreign&&d.fx){$("s-fx").value=inStr(d.fx);filled.push("s-fx");}else if(foreign)miss.push(tt("เรตแลกเงิน","exchange rate"));
   if(d.price){
@@ -1183,7 +1213,7 @@ function fillSell(d){
     else{$("s-tp").value=inStr(d.price);filled.push("s-tp");}
   }else miss.push(tt("ราคา","price"));
   let note="";
-  if(d.qty){$("s-qty").value=String(Math.min(d.qty,l.qty));filled.push("s-qty");if(d.qty>l.qty+1e-9)note=tt(` ภาพขาย ${nfq.format(d.qty)} หุ้น แต่รายการนี้มี ${nfq.format(l.qty)} หุ้น`,` The image sells ${nfq.format(d.qty)} shares but this entry has ${nfq.format(l.qty)}`);}
+  if(d.qty){$("s-qty").value=String(Math.min(d.qty,H));filled.push("s-qty");if(d.qty>H+1e-4)note=tt(` ภาพขาย ${nfq.format(d.qty)} หุ้น แต่รายการนี้มี ${nfq.format(H)} หุ้น`,` The image sells ${nfq.format(d.qty)} shares but this entry has ${nfq.format(H)}`);}
   if(d.date){$("s-date").value=d.date;filled.push("s-date");}
   sLink.reset(); pvSell(); flash(filled); setZone("sell","done",missMsg(miss)+note);
 }

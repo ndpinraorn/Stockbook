@@ -119,6 +119,22 @@
     return out;
   }
 
+  /* Real money moved, fees included: "ยอดที่จะได้รับคืน" on a sell, the amount paid on a
+     buy. Also "มูลค่าหุ้น" (shares × price) as a cross-check. Value on the same line or the next. */
+  const NET_SELL = /ได\S{0,2}\s*รับ\s*ค\S{0,2}น/;
+  const NET_BUY = /(ยอด\s*ท\S{0,3}\s*ต\S{0,2}อง\s*(ชำ|ช\S{0,2}ระ|จ\S{0,2}าย)|ยอด\s*ชำระ|ยอด\s*รวม|ยอด\s*ที่\s*ชำระ|ยอด\s*ที่\s*จ\S{0,2}าย)/;
+  const GROSS = /มูลค\S{0,2}า\s*หุ/;
+  function labelled(text, re) {
+    const lines = String(text).split(/\n+/).map((s) => s.trim()).filter(Boolean);
+    for (let i = 0; i < lines.length; i++) {
+      if (!re.test(lines[i])) continue;
+      const after = numsIn(lines[i].split(re).pop() || "");
+      const n = after.length ? after : numsIn(lines[i + 1] || "");
+      if (n.length) return n[0].v;
+    }
+    return null;
+  }
+
   /* Order confirmation: price per share, shares, rate, date. Price × shares must match a
      total on the screen, which keeps us from mixing up the per-share price and the total. */
   function parseOrder(text) {
@@ -159,9 +175,16 @@
     const totalThb = thb.length ? Math.max(...thb) : null;
     let rate = cur === "THB" ? 1 : fx ? fx.fx : null;
     if (!price && totalThb && qty && rate) price = totalThb / rate / qty;
+    const gross = labelled(body, GROSS);
+    if (!qty && gross && price) qty = +(gross / price).toFixed(7);
+    const side = sideOf(t);
+    let amount = labelled(body, side === "buy" ? NET_BUY : NET_SELL) || (side ? null : labelled(body, NET_SELL));
+    const ref = price && qty ? price * qty : gross;
+    if (amount && ref && Math.abs(amount - ref) / ref > 0.03) amount = null;
     const dates = findDates(t);
     return {
-      side: sideOf(t),
+      amount: amount || null,
+      side,
       symbol: symbolOf(t),
       cur,
       price: price || null,
