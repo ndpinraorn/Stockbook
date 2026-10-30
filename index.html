@@ -1261,7 +1261,7 @@ function gErr(m){$("g-err").textContent=m||"";$("g-err").hidden=!m;}
 function noStorage(){const n=$("g-note");n.hidden=false;n.innerHTML="<b>ยังไม่ได้เชื่อมฐานข้อมูล</b>ติดต่อผู้ดูแลเว็บ";}
 async function onGoogle(resp){
   gErr("");
-  $("gBtn").innerHTML='<span class="gload">กำลังเข้าสู่ระบบ…</span>';
+  $("gBtn").dataset.r=""; $("gBtn").innerHTML='<span class="gload">กำลังเข้าสู่ระบบ…</span>';
   try{
     const r=await api("/api/auth",{method:"POST",body:JSON.stringify({action:"google",credential:resp.credential})});
     if(r.status===503){noStorage();throw 0;}
@@ -1273,9 +1273,10 @@ async function onGoogle(resp){
 }
 function renderGoogleBtn(){
   const box=$("gBtn");
-  if(!(window.google&&google.accounts&&google.accounts.id)){box.innerHTML='<span class="gload">กำลังโหลดปุ่ม Google…</span>';return false;}
+  if(!(window.google&&google.accounts&&google.accounts.id)){box.dataset.r="";box.innerHTML='<span class="gload">กำลังโหลดปุ่ม Google…</span>';return false;}
   if(!gReady){google.accounts.id.initialize({client_id:GOOGLE_CLIENT_ID,callback:onGoogle,auto_select:true,cancel_on_tap_outside:true,use_fedcm_for_prompt:true});gReady=true;}
-  box.innerHTML="";
+  if(box.dataset.r==="1")return true;
+  box.dataset.r="1"; box.innerHTML="";
   const w=Math.min(360,Math.max(220,box.clientWidth||320));
   google.accounts.id.renderButton(box,{theme:"filled_black",size:"large",shape:"pill",text:"signin_with",locale:"th",width:w,logo_alignment:"center"});
   return true;
