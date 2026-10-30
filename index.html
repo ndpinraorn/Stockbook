@@ -87,6 +87,15 @@ button{cursor:pointer}
 .fact .k{font-size:13px;color:var(--muted)}
 .fact .v{font-size:18px;font-weight:600;margin-top:1px}
 
+/* first-run */
+.welcome{display:flex;flex-direction:column;align-items:flex-start;gap:10px;padding:36px 28px;border-radius:16px;background:var(--surface-solid);border:1px solid var(--line);box-shadow:var(--shadow);animation:fadeup .5s cubic-bezier(.2,.8,.2,1)}
+.welcome .w-ic{width:48px;height:48px;border-radius:13px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center}
+.welcome .w-ic svg{width:24px;height:24px}
+.welcome h2{margin:6px 0 0;font-size:24px;font-weight:700}
+.welcome p{margin:0;color:var(--muted);max-width:46ch}
+.welcome .w-acts{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
+.welcome .submit{padding:11px 22px}
+
 /* sections */
 .sec-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
 .sec-head h2{margin:0;font-size:19px;font-weight:700}
@@ -276,17 +285,20 @@ th[aria-sort] .sortb{color:var(--fg)}
     </details>
   </header>
 
-  <div class="banner" id="sampleBanner" hidden>
-    <div><b>นี่คือข้อมูลตัวอย่าง</b> จดรายการแรกของคุณแล้วตัวอย่างจะหายไปเอง</div>
-    <button type="button" class="btn primary" data-open-add>จดการซื้อ</button>
-  </div>
 
   <div class="banner" id="moveBanner" hidden>
     <div><b>พบข้อมูลเดิมในเครื่องนี้</b> <span id="moveText"></span></div>
     <div style="display:flex;gap:6px"><button type="button" class="btn" id="moveSkip">ไม่ต้อง</button><button type="button" class="btn primary" id="moveGo">ย้ายเข้าบัญชี</button></div>
   </div>
 
-  <section class="hero" aria-label="สรุปผล">
+  <section class="welcome" id="welcome" hidden>
+    <div class="w-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5a2 2 0 0 1 2-2h11l3 3v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M8 9h8M8 13h8M8 17h5"/></svg></div>
+    <h2>เริ่มจดรายการแรก</h2>
+    <p>จดตอนซื้อ แล้วใส่ราคาขายทีหลัง ระบบจะคำนวณกำไร ROI และปันผลเป็นเงินบาทให้</p>
+    <div class="w-acts"><button type="button" class="submit" data-open-add>จดการซื้อ</button><button type="button" class="pillbtn" data-scan-pick="main">อ่านจากภาพ Dime</button></div>
+  </section>
+
+  <section class="hero" id="heroSec" aria-label="สรุปผล">
     <div class="eyebrow">กำไร / ขาดทุนที่ขายแล้ว</div>
     <div class="big-row"><div class="big num" id="plBig">฿0.00</div><span class="pill num zero" id="roiPill" hidden></span></div>
     <div class="split" id="split"></div>
@@ -297,7 +309,7 @@ th[aria-sort] .sortb{color:var(--fg)}
     </div>
   </section>
 
-  <div class="toolbar">
+  <div class="toolbar" id="tradeTools">
     <div class="tabs" role="group" aria-label="กรองรายการ">
       <button type="button" data-f="all" aria-pressed="true">ทั้งหมด<span class="c num" id="cAll"></span></button>
       <button type="button" data-f="hold" aria-pressed="false">ยังถืออยู่<span class="c num" id="cHold"></span></button>
@@ -307,7 +319,7 @@ th[aria-sort] .sortb{color:var(--fg)}
   </div>
   <div id="list"></div>
 
-  <section aria-labelledby="divTitle" style="display:flex;flex-direction:column;gap:12px;margin-top:8px">
+  <section id="divSec" aria-labelledby="divTitle" style="display:flex;flex-direction:column;gap:12px;margin-top:8px">
     <div class="sec-head">
       <h2 id="divTitle">ปันผล</h2>
       <div class="sec-actions"><span class="aside" id="divStatus"></span><button type="button" class="pillbtn" id="divAdd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>จดปันผล</button></div>
@@ -461,13 +473,6 @@ th[aria-sort] .sortb{color:var(--fg)}
 <script>
 (function(){
 "use strict";
-const SAMPLE=[
- {id:"x1",symbol:"PTT",ccy:"THB",qty:1000,buyPrice:32.75,buyFx:1,buyDate:"2025-02-10",sellPrice:35.5,sellFx:1,sellDate:"2025-08-04",note:"",createdAt:1},
- {id:"x2",symbol:"CPALL",ccy:"THB",qty:500,buyPrice:58.25,buyFx:1,buyDate:"2025-03-04",sellPrice:54.75,sellFx:1,sellDate:"2025-07-21",note:"",createdAt:2},
- {id:"x3",symbol:"AAPL",ccy:"USD",qty:10,buyPrice:212.4,buyFx:34.9,buyDate:"2025-03-18",sellPrice:null,sellFx:null,sellDate:null,note:"",createdAt:3},
- {id:"x4",symbol:"NVDA",ccy:"USD",qty:8,buyPrice:118.6,buyFx:34.6,buyDate:"2025-04-02",sellPrice:162.3,sellFx:33.8,sellDate:"2025-08-21",note:"",createdAt:4},
- {id:"x5",symbol:"KBANK",ccy:"THB",qty:200,buyPrice:151,buyFx:1,buyDate:"2025-09-15",sellPrice:null,sellFx:null,sellDate:null,note:"",createdAt:5}
-];
 const SYM={THB:"฿",USD:"$",HKD:"HK$",CNY:"¥",JPY:"¥",EUR:"€",GBP:"£",SGD:"S$"};
 const MKT={THB:"หุ้นไทย",USD:"หุ้นสหรัฐ",HKD:"หุ้นฮ่องกง",CNY:"หุ้นจีน",JPY:"หุ้นญี่ปุ่น",EUR:"หุ้นยุโรป",GBP:"หุ้นอังกฤษ",SGD:"หุ้นสิงคโปร์"};
 const DEFAULT_RATES={USD:33.77,HKD:4.34,CNY:4.74,JPY:0.22,EUR:39.2,GBP:45.0,SGD:26.0};
@@ -505,8 +510,8 @@ const fdate=d=>{if(!d)return"";try{return new Date(d+"T00:00:00").toLocaleDateSt
 const today=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");};
 const newId=p=>(p||"l")+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 const sold=l=>l.sellPrice!=null&&l.sellPrice>0;
-const isSample=()=>data.lots.length===0;
-const lots=()=>isSample()?SAMPLE:data.lots;
+const isSample=()=>false;
+const lots=()=>data.lots;
 const rateOf=c=>c==="THB"?1:(+data.rates[c]||DEFAULT_RATES[c]||0);
 const fxB=l=>l.ccy==="THB"?1:(+l.buyFx||rateOf(l.ccy));
 const fxS=l=>l.ccy==="THB"?1:(+l.sellFx||rateOf(l.ccy));
@@ -581,7 +586,8 @@ function scheduleDividends(){clearTimeout(divTimer);divTimer=setTimeout(()=>fetc
 /* ---------- render ---------- */
 function render(){
   const L=lots(), sample=isSample();
-  $("sampleBanner").hidden=!sample||!$("moveBanner").hidden;
+  const empty=!L.length;
+  $("heroSec").hidden=empty; $("tradeTools").hidden=empty; $("divSec").hidden=empty; $("welcome").hidden=!empty;
   const S=L.filter(sold), H=L.filter(l=>!sold(l));
   const pl=S.reduce((a,l)=>a+plT(l),0), sc=S.reduce((a,l)=>a+costT(l),0), hc=H.reduce((a,l)=>a+costT(l),0);
   const roi=sc>0?pl/sc:0;
@@ -595,6 +601,7 @@ function render(){
   $("cAll").textContent=L.length; $("cHold").textContent=H.length; $("cSold").textContent=S.length;
 
   const base=st.f==="hold"?H:st.f==="sold"?S:L;
+  $("list").hidden=empty;
   $("list").innerHTML=base.length?tableHTML(sortLots(base),sample):`<div class="tblwrap"><div class="empty">${st.f==="hold"?"ไม่มีหุ้นที่ยังถืออยู่":st.f==="sold"?"ยังไม่มีรายการที่ขาย":"ยังไม่มีรายการ กด “จดการซื้อ” เพื่อเริ่ม"}</div></div>`;
 
   const rows=divRows(L);
