@@ -764,7 +764,7 @@ function render(){
 function sortLots(arr){
   const {key,dir}=st.sort, a=arr.slice();
   if(key==="default")return a.sort((x,y)=>{if(sold(x)!==sold(y))return sold(x)?1:-1;const dx=x.sellDate||x.buyDate,dy=y.sellDate||y.buyDate;return dx>dy?-1:dx<dy?1:(y.createdAt||0)-(x.createdAt||0);});
-  const val={symbol:l=>l.symbol,buy:l=>l.buyDate||"",sell:l=>l.sellDate||"",cost:costT,pl:l=>sold(l)?pctT(l):-Infinity}[key];
+  const val={symbol:l=>l.symbol,buy:costT,sell:l=>sold(l)?sellT(l)*l.qty:-Infinity,cost:costT,pl:l=>sold(l)?pctT(l):-Infinity}[key];
   return a.sort((x,y)=>{const vx=val(x),vy=val(y);return (vx>vy?1:vx<vy?-1:0)*dir;});
 }
 function th(label,key,cls){
@@ -775,17 +775,17 @@ const orig=(p,c)=>c==="THB"?"":money(p,c)+" · ";
 function tableHTML(list,sample){
   const S=list.filter(sold);
   const tpl=S.reduce((a,l)=>a+plT(l),0), tc=S.reduce((a,l)=>a+costT(l),0), tr=tc>0?tpl/tc:0;
-  const foot=S.length?`<tr><td>${tt("รวมที่ขายแล้ว","Total sold")}</td><td class="m-only"></td><td class="d-only"></td><td class="d-only"></td><td class="r num d-only">${baht(tc)}</td><td class="r plc"><div class="main num tone-${tone(tpl)}">${baht(tpl,true)}</div><div class="sub num tone-${tone(tpl)}">${pct(tr)}</div></td><td class="d-only"></td></tr>`:"";
+  const ts=S.reduce((a,l)=>a+sellT(l)*l.qty,0);
+  const foot=S.length?`<tr><td>${tt("รวมที่ขายแล้ว","Total sold")}</td><td class="m-only"></td><td class="r num d-only">${baht(tc)}</td><td class="r num d-only">${baht(ts)}</td><td class="r plc"><div class="main num tone-${tone(tpl)}">${baht(tpl,true)}</div><div class="sub num tone-${tone(tpl)}">${pct(tr)}</div></td><td class="d-only"></td></tr>`:"";
   return `<div class="tblwrap"><table class="tbl"><thead><tr>
-    ${th(tt("หุ้น","Stock"),"symbol")}<th class="m-only">${tt("ราคา (บาท)","Price (THB)")}</th>${th(tt("ซื้อ","Buy"),"buy","r d-only")}${th(tt("ขาย","Sell"),"sell","r d-only")}${th(tt("ต้นทุน","Cost"),"cost","r d-only")}${th(tt("กำไร / ขาดทุน","Profit / loss"),"pl","r plc")}<th class="d-only"><span style="position:absolute;left:-9999px">${tt("จัดการ","Actions")}</span></th>
+    ${th(tt("หุ้น","Stock"),"symbol")}<th class="m-only">${tt("ยอด (บาท)","Amount (THB)")}</th>${th(tt("ยอดซื้อ","Buy total"),"buy","r d-only")}${th(tt("ยอดขาย","Sell total"),"sell","r d-only")}${th(tt("กำไร / ขาดทุน","Profit / loss"),"pl","r plc")}<th class="d-only"><span style="position:absolute;left:-9999px">${tt("จัดการ","Actions")}</span></th>
   </tr></thead><tbody>`+list.map(l=>{
     const s=sold(l), p=plT(l);
     return `<tr${sample?"":` class="tap" data-edit="${esc(l.id)}"`}>
       <td><div class="sym-wrap">${avatar(l.symbol)}<div><div class="symn">${esc(l.symbol)}${mktChip(l.ccy)}</div><div class="sub num">${nfq.format(l.qty)} ${tt("หุ้น","shares")}${l.note?" · "+esc(l.note):""}</div></div></div></td>
-      <td class="m-only"><div class="mline num"><span class="mk">${tt("ซื้อ","Buy")}</span>${baht(buyT(l))}</div><div class="mline num"><span class="mk">${tt("ขาย","Sell")}</span>${s?baht(sellT(l)):`<span class="chip hold">${tt("ยังถือ","Holding")}</span>`}</div></td>
-      <td class="r d-only"><div class="main num">${baht(buyT(l))}</div><div class="sub num">${orig(l.buyPrice,l.ccy)}${fdate(l.buyDate)}</div></td>
-      <td class="r d-only">${s?`<div class="main num">${baht(sellT(l))}</div><div class="sub num">${orig(l.sellPrice,l.ccy)}${fdate(l.sellDate)}</div>`:`<span class="chip hold">${tt("ยังถือ","Holding")}</span>`}</td>
-      <td class="r num d-only">${baht(costT(l))}</td>
+      <td class="m-only"><div class="mline num"><span class="mk">${tt("ซื้อ","Buy")}</span>${baht(costT(l))}</div><div class="mline num"><span class="mk">${tt("ขาย","Sell")}</span>${s?baht(sellT(l)*l.qty):`<span class="chip hold">${tt("ยังถือ","Holding")}</span>`}</div></td>
+      <td class="r d-only"><div class="main num">${baht(costT(l))}</div><div class="sub num">${orig(l.buyPrice*l.qty,l.ccy)}${fdate(l.buyDate)}</div></td>
+      <td class="r d-only">${s?`<div class="main num">${baht(sellT(l)*l.qty)}</div><div class="sub num">${orig(l.sellPrice*l.qty,l.ccy)}${fdate(l.sellDate)}</div>`:`<span class="chip hold">${tt("ยังถือ","Holding")}</span>`}</td>
       <td class="r plc">${s?`<span class="plpill num ${tone(p)}">${baht(p,true)}</span><div class="sub num tone-${tone(p)}" style="margin-top:4px">${pct(pctT(l))}</div>`:(sample?`<span class="muted">—</span>`:`<button type="button" class="mini primary m-btn" data-sell="${esc(l.id)}">${tt("ขาย","Sell")}</button><span class="muted d-only">—</span>`)}</td>
       <td class="d-only">${sample?"":`<div class="acts">${s?"":`<button type="button" class="mini primary" data-sell="${esc(l.id)}">${tt("ขาย","Sell")}</button>`}<button type="button" class="mini" data-edit="${esc(l.id)}">${tt("แก้ไข","Edit")}</button></div>`}</td></tr>`;
   }).join("")+`</tbody>${foot?`<tfoot>${foot}</tfoot>`:""}</table></div>`;
