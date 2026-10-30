@@ -153,6 +153,12 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
 .pillbtn:hover{border-color:var(--accent-line);background:var(--card-2)}
 .pillbtn:active{transform:scale(.96)}
 .pillbtn svg{width:17px;height:17px;color:var(--accent)}
+.sec-toggle{display:inline-flex;align-items:center;gap:10px;border:0;background:none;padding:6px 4px 6px 0;color:var(--fg);font:inherit;font-size:20px;font-weight:700;cursor:pointer}
+.sec-toggle .chev{width:20px;height:20px;color:var(--muted);transition:transform .2s ease}
+.sec-toggle[aria-expanded="true"] .chev{transform:rotate(90deg)}
+.sec-sum{font-size:14px;font-weight:500;color:var(--muted)}
+.sec-body{display:flex;flex-direction:column;gap:12px}
+.morebtn{display:flex;width:fit-content;margin:12px auto 0}
 .note-line{font-size:12.5px;color:var(--faint);line-height:1.6;margin-top:-6px}
 
 /* list (table) */
@@ -385,14 +391,6 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.8)}
     </div>
   </section>
 
-  <section class="chart-card card" id="chartCard" aria-labelledby="chartTitle">
-    <div class="chart-head"><h3 id="chartTitle">กำไรสะสมจากที่ขาย</h3><span class="aside">ใช้เงินซื้อไป <span class="num" id="fSoldCost">฿0.00</span></span></div>
-    <div class="chart-box" id="chartBox"></div>
-    <div class="ranges" role="group" aria-label="ช่วงเวลา">
-      <button type="button" data-range="1M" aria-pressed="false">1M</button><button type="button" data-range="3M" aria-pressed="false">3M</button><button type="button" data-range="6M" aria-pressed="false">6M</button><button type="button" data-range="1Y" aria-pressed="false">1Y</button><button type="button" data-range="ALL" aria-pressed="true">ALL</button>
-    </div>
-  </section>
-
   <div class="toolbar" id="tradeTools">
     <div class="tabs" role="group" aria-label="กรองรายการ">
       <button type="button" data-f="all" aria-pressed="true">ทั้งหมด<span class="c num" id="cAll"></span></button>
@@ -404,11 +402,13 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.8)}
 
   <section id="divSec" aria-labelledby="divTitle" style="display:flex;flex-direction:column;gap:12px;margin-top:8px">
     <div class="sec-head">
-      <h2 id="divTitle">ปันผล</h2>
+      <h2 id="divTitle"><button type="button" class="sec-toggle" id="divToggle" aria-expanded="false" aria-controls="divBody"><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg><span>ปันผล</span><span class="sec-sum num" id="divSum"></span></button></h2>
       <div class="sec-actions"><span class="aside" id="divStatus"></span><button type="button" class="pillbtn" id="divAdd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>จดปันผล</button></div>
     </div>
+    <div id="divBody" class="sec-body" hidden>
     <div class="note-line">ยอด <span class="chip est">ประมาณ</span> คิดจากปันผลต่อหุ้น × หุ้นที่ถือก่อนวัน XD หักภาษี 15% สำหรับหุ้นสหรัฐ และ 10% สำหรับหุ้นไทย แปลงเป็นบาทด้วยเรตล่าสุดที่คุณใช้ กด “ใส่ยอดจริง” เพื่อแทนด้วยตัวเลขจาก Dime</div>
     <div id="divList"></div>
+    </div>
   </section>
 </div>
 
@@ -737,7 +737,7 @@ function scheduleDividends(){clearTimeout(divTimer);divTimer=setTimeout(()=>fetc
 function render(){
   const L=lots(), sample=isSample();
   const empty=!L.length;
-  $("heroSec").hidden=empty; $("holdCard").hidden=empty; $("chartCard").hidden=empty; $("tradeTools").hidden=empty; $("divSec").hidden=empty; $("welcome").hidden=!empty;
+  $("heroSec").hidden=empty; $("holdCard").hidden=empty; $("tradeTools").hidden=empty; $("divSec").hidden=empty; $("welcome").hidden=!empty;
   const S=L.filter(sold), H=L.filter(l=>!sold(l));
   const pl=S.reduce((a,l)=>a+plT(l),0), sc=S.reduce((a,l)=>a+costT(l),0), hc=H.reduce((a,l)=>a+costT(l),0);
   const roi=sc>0?pl/sc:0;
@@ -747,8 +747,7 @@ function render(){
   const ks=Object.keys(by).sort(ccyOrder);
   $("split").innerHTML=!S.length?tt("ยังไม่มีรายการที่ขาย ใส่ราคาขายแล้วกำไรจะขึ้นที่นี่","No sells yet. Add a sell price and your profit shows here"):ks.length>1?ks.map(k=>`<span>${MKT[k]||k}<b class="num tone-${tone(by[k])}">${baht(by[k],true)}</b></span>`).join(""):"";
   $("split").hidden=!!S.length&&ks.length<=1;
-  $("fSoldCost").textContent=baht(sc); $("fHoldCost").textContent=baht(hc);
-  if(!empty)renderChart(L);
+  $("fHoldCost").textContent=baht(hc);
   $("cAll").textContent=L.length; $("cHold").textContent=H.length; $("cSold").textContent=S.length;
 
   const base=st.f==="hold"?H:st.f==="sold"?S:L;
@@ -759,7 +758,10 @@ function render(){
   $("fDiv").textContent=baht(rows.reduce((a,r)=>a+(r.thb||0),0));
   $("divStatus").textContent=divState==="loading"?tt("กำลังดึงข้อมูลปันผล…","Loading dividends…"):divState==="error"?tt("ดึงข้อมูลปันผลไม่สำเร็จ","Couldn't load dividends"):"";
   $("divAdd").hidden=sample;
-  $("divList").innerHTML=divHTML(rows,sample);
+  const dtot=rows.reduce((a,r)=>a+(r.thb||0),0);
+  $("divSum").textContent=rows.length?`${baht(dtot)} · ${rows.length} ${tt("รายการ","items")}`:"";
+  $("divToggle").setAttribute("aria-expanded",String(divOpen)); $("divBody").hidden=!divOpen;
+  $("divList").innerHTML=divHTML(divAll?rows:rows.slice(0,DIV_LIMIT),sample,dtot)+(rows.length>DIV_LIMIT?`<button type="button" class="pillbtn morebtn" id="divMore">${divAll?tt("ย่อเหลือ 5 รายการล่าสุด","Show latest 5 only"):tt(`ดูทั้งหมด (${rows.length} รายการ)`,`Show all (${rows.length})`)}</button>`:"");
 }
 function sortLots(arr){
   const {key,dir}=st.sort, a=arr.slice();
@@ -790,12 +792,16 @@ function tableHTML(list,sample){
       <td class="d-only">${sample?"":`<div class="acts">${s?"":`<button type="button" class="mini primary" data-sell="${esc(l.id)}">${tt("ขาย","Sell")}</button>`}<button type="button" class="mini" data-edit="${esc(l.id)}">${tt("แก้ไข","Edit")}</button></div>`}</td></tr>`;
   }).join("")+`</tbody>${foot?`<tfoot>${foot}</tfoot>`:""}</table></div>`;
 }
-function divHTML(rows,sample){
+const DIV_LIMIT=5;
+let divOpen=(()=>{try{return localStorage.getItem("stockbook.divopen")==="1";}catch(e){return false;}})(), divAll=false;
+$("divToggle").addEventListener("click",()=>{divOpen=!divOpen;if(!divOpen)divAll=false;try{localStorage.setItem("stockbook.divopen",divOpen?"1":"0");}catch(e){}render();});
+$("divList").addEventListener("click",e=>{if(e.target.closest("#divMore")){divAll=!divAll;render();}});
+function divHTML(rows,sample,total){
   if(!rows.length){
     const msg=divState==="loading"?tt("กำลังดึงข้อมูลปันผล…","Loading dividends…"):divState==="error"?tt("ดึงข้อมูลปันผลไม่สำเร็จ ลองรีเฟรชหน้า หรือกด “จดปันผล” เพื่อใส่เอง","Couldn't load dividends. Refresh, or tap “Log dividend” to add one yourself"):tt("ยังไม่มีปันผลสำหรับหุ้นในสมุด","No dividends yet for your stocks");
     return `<div class="tblwrap"><div class="empty">${msg}</div></div>`;
   }
-  const tot=rows.reduce((a,r)=>a+(r.thb||0),0);
+  const tot=total!=null?total:rows.reduce((a,r)=>a+(r.thb||0),0);
   return `<div class="tblwrap"><table class="tbl"><thead><tr><th>${tt("หุ้น","Stock")}</th><th class="d-only">${tt("วันที่","Date")}</th><th class="r d-only">${tt("ต่อหุ้น","Per share")}</th><th class="r d-only">${tt("หุ้นที่ถือ","Shares held")}</th><th class="r plc">${tt("ได้รับ (บาท)","Received (THB)")}</th><th class="d-only"><span style="position:absolute;left:-9999px">${tt("จัดการ","Actions")}</span></th></tr></thead><tbody>`+
   rows.map(r=>{
     const isAct=r.type==="act";
@@ -820,71 +826,8 @@ function avatar(sym){
   return `<span class="av" aria-hidden="true" style="background:linear-gradient(140deg,hsl(${a} 70% 58%),hsl(${b} 72% 46%));font-size:${t.length>3?10.5:12}px">${esc(t)}</span>`;
 }
 
-$("qaDiv").addEventListener("click",()=>$("divSec").scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"}));
+$("qaDiv").addEventListener("click",()=>{if(!divOpen){divOpen=true;render();}$("divSec").scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"});});
 
-/* ---------- cumulative P/L chart ---------- */
-let chartRange="ALL", chartPts=[];
-document.querySelectorAll("[data-range]").forEach(b=>b.addEventListener("click",()=>{chartRange=b.dataset.range;document.querySelectorAll("[data-range]").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));renderChart(lots());}));
-function smoothPath(P){
-  // monotone cubic (Fritsch–Carlson): smooth without overshooting the data
-  const n=P.length; if(n<2)return"";
-  const dx=[],dy=[],m=[],t=[];
-  for(let i=0;i<n-1;i++){dx[i]=P[i+1].x-P[i].x;dy[i]=P[i+1].y-P[i].y;m[i]=dx[i]?dy[i]/dx[i]:0;}
-  t[0]=m[0];t[n-1]=m[n-2];
-  for(let i=1;i<n-1;i++)t[i]=m[i-1]*m[i]<=0?0:(m[i-1]+m[i])/2;
-  for(let i=0;i<n-1;i++){if(!m[i]){t[i]=t[i+1]=0;continue;}const a=t[i]/m[i],b=t[i+1]/m[i],s=a*a+b*b;if(s>9){const k=3/Math.sqrt(s);t[i]=k*a*m[i];t[i+1]=k*b*m[i];}}
-  let d=`M${P[0].x},${P[0].y}`;
-  for(let i=0;i<n-1;i++){const h=dx[i]/3;d+=` C${P[i].x+h},${P[i].y+t[i]*h} ${P[i+1].x-h},${P[i+1].y-t[i+1]*h} ${P[i+1].x},${P[i+1].y}`;}
-  return d;
-}
-function renderChart(L){
-  const box=$("chartBox");
-  const S=L.filter(sold).sort((a,b)=>a.sellDate<b.sellDate?-1:a.sellDate>b.sellDate?1:0);
-  const pts=[]; let cum=0;
-  for(const l of S){cum+=plT(l);const last=pts[pts.length-1];if(last&&last.d===l.sellDate)last.v=cum;else pts.push({d:l.sellDate,v:cum});}
-  if(pts.length<1){box.innerHTML=`<div class="chart-empty">${tt("ใส่ราคาขายรายการแรกแล้วกราฟกำไรจะขึ้นที่นี่","Add your first sell price and the profit chart shows here")}</div>`;chartPts=[];return;}
-  const days={"1M":30,"3M":91,"6M":182,"1Y":365}[chartRange];
-  let P=[{d:pts[0].d,v:0},...pts];
-  if(days){
-    const start=new Date(Date.now()-days*864e5).toISOString().slice(0,10);
-    const before=P.filter(p=>p.d<start);
-    P=[{d:start,v:before.length?before[before.length-1].v:0},...P.filter(p=>p.d>=start)];
-  }
-  const now=today(); if(P[P.length-1].d<now)P.push({d:now,v:P[P.length-1].v});
-  if(P.length<2)P.unshift({d:P[0].d,v:P[0].v});
-  const W=1000,H=210,padT=24,padB=26;
-  const t0=Date.parse(P[0].d),t1=Math.max(Date.parse(P[P.length-1].d),t0+864e5);
-  let lo=Math.min(0,...P.map(p=>p.v)),hi=Math.max(0,...P.map(p=>p.v)); if(hi-lo<1){hi+=1;lo-=1;}
-  const X=d=>14+(Date.parse(d)-t0)/(t1-t0)*(W-40), Y=v=>padT+(hi-v)/(hi-lo)*(H-padT-padB);
-  const XY=P.map(p=>({x:+X(p.d).toFixed(1),y:+Y(p.v).toFixed(1),d:p.d,v:p.v}));
-  const line=smoothPath(XY), area=line+` L${XY[XY.length-1].x},${H} L${XY[0].x},${H} Z`, zy=Y(0).toFixed(1);
-  const id="g"+Math.random().toString(36).slice(2,7);
-  chartPts=XY.map(p=>({...p,px:p.x/W,py:p.y/H}));
-  const end=chartPts[chartPts.length-1];
-  box.innerHTML=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true">
-    <defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--accent-2)" stop-opacity=".55"/><stop offset="1" stop-color="var(--accent)" stop-opacity="0"/></linearGradient>
-    <linearGradient id="${id}l" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="var(--accent)"/><stop offset="1" stop-color="var(--accent-2)"/></linearGradient></defs>
-    <line x1="0" x2="${W}" y1="${zy}" y2="${zy}" stroke="var(--line-strong)" stroke-dasharray="4 6" vector-effect="non-scaling-stroke"/>
-    <path d="${area}" fill="url(#${id})"/>
-    <path d="${line}" fill="none" stroke="url(#${id}l)" stroke-width="3" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
-  </svg><span class="chart-end" style="left:${end.px*100}%;top:${end.py*100}%"></span><span class="chart-vline" hidden></span><span class="chart-dot" hidden></span><div class="chart-tip" hidden></div>`;
-  box.setAttribute("aria-label",`${tt("กำไรสะสม","Cumulative profit")} ${baht(end.v,true)}`);
-}
-function chartHover(e){
-  if(!chartPts.length)return;
-  const box=$("chartBox"), r=box.getBoundingClientRect(), fx=(e.clientX-r.left)/r.width;
-  let best=chartPts[0]; for(const p of chartPts)if(Math.abs(p.px-fx)<Math.abs(best.px-fx))best=p;
-  const dot=box.querySelector(".chart-dot"), tip=box.querySelector(".chart-tip"), vl=box.querySelector(".chart-vline"); if(!dot)return;
-  dot.hidden=tip.hidden=vl.hidden=false;
-  dot.style.left=vl.style.left=best.px*100+"%"; dot.style.top=best.py*100+"%";
-  tip.innerHTML=`${fdate(best.d)}<b class="num tone-${tone(best.v)}">${baht(best.v,true)}</b>`;
-  const tw=tip.offsetWidth, left=Math.min(Math.max(best.px*r.width,tw/2+8),r.width-tw/2-8);
-  tip.style.left=left+"px"; tip.style.top=(best.py*r.height>r.height/2?8:r.height-tip.offsetHeight-8)+"px";
-}
-function chartLeave(){const box=$("chartBox");box.querySelectorAll(".chart-dot,.chart-tip,.chart-vline").forEach(x=>x.hidden=true);}
-$("chartBox").addEventListener("pointermove",chartHover);
-$("chartBox").addEventListener("pointerdown",chartHover);
-$("chartBox").addEventListener("pointerleave",chartLeave);
 
 /* ---------- sheets ---------- */
 let lastFocus=null;
